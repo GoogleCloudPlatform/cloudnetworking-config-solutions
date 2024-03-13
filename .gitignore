@@ -1,0 +1,13 @@
+**/.terraform
+**/dev*.tfvars
+**/providers.tf
+**/terraform.tfstate*
+**/.terraform.tfstate.lock.info
+**/.terraform.lock.hcl
+**/*.auto.tfvars
+**/pkg*
+go.mod
+go.sum
+**/*.log
+**/*plan*
+**/*.DS_Store
