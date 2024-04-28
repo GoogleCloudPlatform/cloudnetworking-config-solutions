@@ -1,5 +1,5 @@
 /**
- * Copyright 2023 Google LLC
+ * Copyright 2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -332,4 +332,10 @@ variable "vpc_create" {
   description = "Create VPC. When set to false, uses a data source to reference existing VPC."
   type        = bool
   default     = true
+}
+
+variable "deletion_policy" {
+  description = "The deletion policy for the service networking connection. Setting to ABANDON allows the resource to be abandoned rather than deleted. This will enable a successful terraform destroy when destroying CloudSQL instances. Use with care as it can lead to dangling resources."
+  type        = string
+  default     = ""
 }

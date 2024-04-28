@@ -1,5 +1,5 @@
 /**
- * Copyright 2023 Google LLC
+ * Copyright 2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,9 +37,10 @@ moved {
 }
 
 resource "google_service_networking_connection" "psa_connection" {
-  count   = var.psa_config != null ? 1 : 0
-  network = local.network.id
-  service = "servicenetworking.googleapis.com"
+  count           = var.psa_config != null ? 1 : 0
+  network         = local.network.id
+  service         = "servicenetworking.googleapis.com"
+  deletion_policy = var.deletion_policy
   reserved_peering_ranges = [
     for k, v in google_compute_global_address.psa_ranges : v.name
   ]
