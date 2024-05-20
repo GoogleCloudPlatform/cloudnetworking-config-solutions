@@ -150,3 +150,8 @@ output "subnets_psc" {
   description = "Private Service Connect subnet resources."
   value       = { for k, v in google_compute_subnetwork.psc : k => v }
 }
+
+output "subnets_psa" {
+  description = "Private Service Access range for Service Networking."
+  value       = { for k, v in google_compute_global_address.psa_ranges : k => v }
+}

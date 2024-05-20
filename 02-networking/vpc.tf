@@ -27,8 +27,9 @@ module "vpc_network" {
       "${var.psa_range_name}" = "${var.psa_range}"
     }
   }
-  shared_vpc_host = var.shared_vpc_host
-  subnets         = var.create_subnetwork ? var.subnets : null
+  shared_vpc_host             = var.shared_vpc_host
+  shared_vpc_service_projects = var.shared_vpc_service_projects
+  subnets                     = var.create_subnetwork ? var.subnets : null
 }
 
 data "google_compute_network" "vpc_network" {

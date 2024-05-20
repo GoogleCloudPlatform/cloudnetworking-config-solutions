@@ -633,5 +633,6 @@ module "vpc" {
 | <a name="output_subnet_self_links"></a> [subnet\_self\_links](#output\_subnet\_self\_links) | Map of subnet self links keyed by name. |
 | <a name="output_subnets"></a> [subnets](#output\_subnets) | Subnet resources. |
 | <a name="output_subnets_proxy_only"></a> [subnets\_proxy\_only](#output\_subnets\_proxy\_only) | L7 ILB or L7 Regional LB subnet resources. |
+| <a name="output_subnets_psa"></a> [subnets\_psa](#output\_subnets\_psa) | Private Service Access range for Service Networking. |
 | <a name="output_subnets_psc"></a> [subnets\_psc](#output\_subnets\_psc) | Private Service Connect subnet resources. |
 <!-- END_TF_DOCS -->
