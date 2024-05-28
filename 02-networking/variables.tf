@@ -273,5 +273,25 @@ variable "tunnel_2_gateway_interface" {
   default     = 1
 }
 
+variable "create_scp_policy" {
+  type        = bool
+  description = "Boolean flat to create a service connection policy. Set to true to create a service connection policy"
+  default     = false
+}
 
+variable "subnets_for_scp_policy" {
+  type        = list(string)
+  description = "List of subnet names to apply the SCP policy to."
+}
 
+variable "scp_connection_limit" {
+  type        = string
+  default     = 5
+  description = "Limit of the total number of connections to be allowed through the policy"
+}
+
+variable "service_class" {
+  type        = string
+  default     = "gcp-memorystore-redis"
+  description = "Allowed service class (static)"
+}

@@ -18,4 +18,10 @@ locals {
   nat_router_name = "${var.nat_name}-route"
   // For generating list of subnet IDs to be displayed as output.
   subnet_ids = [for subnetwork_link in data.google_compute_network.vpc_network.subnetworks_self_links : trimprefix(subnetwork_link, "https://www.googleapis.com/compute/v1/")]
+  // Subnets for SCP
+  subnet_self_links_for_scp_policy = [
+    for subnet in module.vpc_network.subnets :
+    subnet.self_link
+    if contains(var.subnets_for_scp_policy, subnet.name)
+  ]
 }

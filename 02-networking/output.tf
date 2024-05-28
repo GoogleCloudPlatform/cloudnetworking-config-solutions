@@ -31,3 +31,31 @@ output "vpc_networks" {
   description = "Complete details of the VPC network."
   value       = module.vpc_network
 }
+
+output "service_connection_policy_ids" {
+  description = "Map of service class to service connection policy IDs"
+  value = {
+    for service_class, policy in google_network_connectivity_service_connection_policy.policy :
+    service_class => policy.id
+  }
+}
+
+output "service_connection_policy_details" {
+  description = "Detailed information about each service connection policy"
+  value = {
+    for service_class, policy in google_network_connectivity_service_connection_policy.policy :
+    service_class => {
+      id          = policy.id
+      name        = policy.name
+      description = policy.description
+      network     = policy.network
+      project_id  = policy.project
+      subnetworks = policy.psc_config[0].subnetworks
+    }
+  }
+}
+
+output "subnet_self_links_for_scp_policy" {
+  value       = local.subnet_self_links_for_scp_policy
+  description = "The self-links of the subnets where the SCP policy is applied."
+}
