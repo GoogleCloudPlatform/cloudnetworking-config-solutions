@@ -1,0 +1,8 @@
+name: dummy2
+project_id: project-dummy-id
+region: us-central1
+database_version: POSTGRES_15
+network_config:
+  connectivity:
+    psa_config:
+      private_network : projects/dummy-hostproject-id/global/networks/dummy-vpc-network
