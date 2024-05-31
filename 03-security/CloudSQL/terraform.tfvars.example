@@ -1,0 +1,11 @@
+project_id = "<your-project-id>"
+network    = "projects/<your-project-id>/global/networks/<your-vpc-name>"
+egress_rules = {
+  allow-egress = {
+    deny = false
+    rules = [{
+      protocol = "tcp"
+      ports    = ["3306"]
+    }]
+  }
+}
