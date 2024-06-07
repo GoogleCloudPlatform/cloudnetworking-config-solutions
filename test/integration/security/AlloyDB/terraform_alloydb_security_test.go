@@ -16,17 +16,18 @@ package integrationtest
 
 import (
 	"fmt"
-	"github.com/gruntwork-io/terratest/modules/shell"
-	"github.com/gruntwork-io/terratest/modules/terraform"
-	"github.com/tidwall/gjson"
 	"math/rand"
 	"os"
 	"testing"
 	"time"
+
+	"github.com/gruntwork-io/terratest/modules/shell"
+	"github.com/gruntwork-io/terratest/modules/terraform"
+	"github.com/tidwall/gjson"
 )
 
 var (
-	terraformDirectoryPath = "../../../03-security"
+	terraformDirectoryPath = "../../../../03-security/AlloyDB"
 	projectID              = os.Getenv("TF_VAR_project_id")
 	uniqueID               = rand.Int() //included as a suffix to the VPC and subnet names.
 	networkName            = fmt.Sprintf("test-vpc-security-%d", uniqueID)
@@ -59,7 +60,6 @@ func TestCreateAlloyDBFirewallRule(t *testing.T) {
 			},
 		}
 	)
-	terraformDirectoryPath = terraformDirectoryPath + "/AlloyDB"
 	terraformOptions := terraform.WithDefaultRetryableErrors(t, &terraform.Options{
 		// Set the path to the Terraform code that will be tested.
 		Vars:                 tfVars,

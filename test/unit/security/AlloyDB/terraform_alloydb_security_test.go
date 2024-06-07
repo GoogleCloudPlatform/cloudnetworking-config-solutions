@@ -14,14 +14,15 @@
 package unittest
 
 import (
+	"testing"
+
 	"github.com/google/go-cmp/cmp"
 	"github.com/gruntwork-io/terratest/modules/terraform"
 	"golang.org/x/exp/slices"
-	"testing"
 )
 
 const (
-	terraformDirectoryPath = "../../../03-security/AlloyDB"
+	terraformDirectoryPath = "../../../../03-security/AlloyDB"
 	network                = "projects/dummy-project/global/networks/dummy-vpc-network01"
 )
 
