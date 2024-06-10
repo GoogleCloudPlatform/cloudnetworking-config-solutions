@@ -1,0 +1,6 @@
+redis_cluster_name: "4915955890040594730"
+project_id: <project-id>
+shard_count: 3
+network_id: vpc-test
+region: us-central1
+replica_count: 0

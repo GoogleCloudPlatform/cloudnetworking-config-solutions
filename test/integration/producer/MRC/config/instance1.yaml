@@ -1,0 +1,4 @@
+redis_cluster_name: mrc-4216939489511574267
+project_id: <<project-id>>
+network_id: projects/project-id/global/networks/vpc-mrc-4216939489511574267-test
+region: us-central1
