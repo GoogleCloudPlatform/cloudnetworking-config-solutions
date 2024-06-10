@@ -282,6 +282,7 @@ variable "create_scp_policy" {
 variable "subnets_for_scp_policy" {
   type        = list(string)
   description = "List of subnet names to apply the SCP policy to."
+  default     = [""]
 }
 
 variable "scp_connection_limit" {

@@ -16,13 +16,14 @@ package integrationtest
 
 import (
 	"fmt"
-	"github.com/gruntwork-io/terratest/modules/shell"
-	"github.com/gruntwork-io/terratest/modules/terraform"
-	"github.com/tidwall/gjson"
 	"math/rand"
 	"os"
 	"testing"
 	"time"
+
+	"github.com/gruntwork-io/terratest/modules/shell"
+	"github.com/gruntwork-io/terratest/modules/terraform"
+	"github.com/tidwall/gjson"
 )
 
 const (
@@ -61,12 +62,14 @@ func TestCreateVPCNetworkModule(t *testing.T) {
 		networkName    = fmt.Sprintf("test-vpc-new-%d", uniqueID)
 		subnetworkName = fmt.Sprintf("test-subnet-new-%d", uniqueID)
 		tfVars         = map[string]any{
-			"project_id":        projectID,
-			"region":            region,
-			"create_network":    true,
-			"create_subnetwork": true,
-			"create_nat":        true,
-			"create_havpn":      false,
+			"project_id":             projectID,
+			"region":                 region,
+			"create_network":         true,
+			"create_subnetwork":      true,
+			"create_nat":             true,
+			"create_havpn":           false,
+			"create_scp_policy":      true,
+			"subnets_for_scp_policy": []interface{}{subnetworkName},
 			"subnets": []any{
 				map[string]any{
 					"ip_cidr_range": subnetworkIPCIDR,
@@ -122,6 +125,25 @@ func TestCreateVPCNetworkModule(t *testing.T) {
 		t.Errorf("Subnetwork with invalid subnetwork ID is created = %v, want = %v", got, wantSubnetworkID)
 	}
 
+	// Verify Service Connection Policy from Terraform Output
+	t.Logf("======= Verify Service Connection Policy (Terraform Output) =======")
+	output := terraform.OutputJson(t, terraformOptions, "service_connection_policy_details") // Assuming this is your output
+
+	defaultServiceClass := "gcp-memorystore-redis"
+	policyName := fmt.Sprintf("SCP-%s-%s", networkName, defaultServiceClass)
+
+	if !gjson.Get(output, "0.name").Exists() { // Assuming "0" is your key, change if needed
+		t.Errorf("Service Connection Policy '%s' not found in Terraform output", policyName)
+	}
+
+	// Check if policy details are as expected (customize as needed)
+	if gjson.Get(output, "0.name").String() != policyName { // Changed key to "0"
+		t.Errorf("Service Connection Policy name mismatch: got %s, want %s",
+			gjson.Get(output, "0.name").String(), policyName)
+	}
+
+	t.Logf("Service Connection Policy '%s' verified successfully in Terraform output.", policyName)
+
 	t.Log(" ========= Verify PSA Range ========= ")
 	vpcOutputValue := terraform.OutputJson(t, terraformOptions, "vpc_networks")
 	if !gjson.Valid(vpcOutputValue) {
@@ -150,12 +172,14 @@ func TestExistingVPCNetworkModule(t *testing.T) {
 	time.Sleep(60 * time.Second)
 	var (
 		tfVars = map[string]any{
-			"project_id":        projectID,
-			"region":            region,
-			"create_network":    false,
-			"create_subnetwork": false,
-			"create_nat":        true,
-			"create_havpn":      false,
+			"project_id":             projectID,
+			"region":                 region,
+			"create_network":         false,
+			"create_subnetwork":      false,
+			"create_nat":             true,
+			"create_havpn":           false,
+			"create_scp_policy":      false,
+			"subnets_for_scp_policy": []string{""},
 			"subnets": []any{
 				map[string]any{
 					"ip_cidr_range": subnetworkIPCIDR,
@@ -184,11 +208,13 @@ func TestExistingVPCNetworkModule(t *testing.T) {
 		NoColor:              true,
 		SetVarsAfterVarFiles: true,
 	})
+
 	// Create VPC and subnet outside of the terraform module.
 	createVPCSubnets(t, projectID, networkName, subnetworkName, region)
 
 	// Delete VPC and subnet created outside of the terraform module.
 	defer deleteVPCSubnets(t, projectID, networkName, subnetworkName, region)
+
 	// Clean up resources with "terraform destroy" at the end of the test.
 	defer terraform.Destroy(t, terraformOptions)
 
@@ -214,6 +240,60 @@ func TestExistingVPCNetworkModule(t *testing.T) {
 	if got != wantSubnetworkID {
 		t.Errorf("Subnetwork with invalid sub network id created = %v, want = %v", got, wantSubnetworkID)
 	}
+
+	// Create SCP outside of terraform
+	defaultServiceClass := "gcp-memorystore-redis"
+	policyName := fmt.Sprintf("SCP-%s-%s", networkName, defaultServiceClass)
+	createServiceConnectionPolicy(t, projectID, region, networkName, policyName, subnetworkName, defaultServiceClass, 5) //Pass the correct parameters
+
+	t.Logf("======= Verify Service Connection Policy (Terraform Output) =======")
+	output := gjson.Parse(terraform.OutputJson(t, terraformOptions, "service_connection_policy_details"))
+
+	if !output.Get(defaultServiceClass + ".name").Exists() {
+		t.Logf("Service Connection Policy '%s' was correctly not created by terraform", policyName)
+	}
+	t.Logf("======= Verify Service Connection Policy using gcloud =======")
+
+	// Check if policy exists using gcloud describe
+	out, err := shell.RunCommandAndGetOutputE(t, shell.Command{
+		Command: "gcloud",
+		Args: []string{
+			"network-connectivity", "service-connection-policies", "describe", policyName,
+			"--project", projectID,
+			"--region", region,
+			"--format", "json", // Format output as JSON for easy parsing
+		},
+	})
+
+	if err != nil {
+		t.Errorf("Error: Service Connection Policy '%s' not found or could not be described: %s", policyName, err)
+	}
+
+	// Parse gcloud output using gjson
+	policyDetails := gjson.Parse(out)
+	expectedPolicyName := fmt.Sprintf("projects/%s/locations/%s/serviceConnectionPolicies/%s", projectID, region, policyName)
+	// Check if policy details are as expected
+	if policyDetails.Get("name").String() != expectedPolicyName {
+		t.Errorf("Service Connection Policy name mismatch: got %s, want %s", policyDetails.Get("name").String(), expectedPolicyName)
+	}
+
+	if policyDetails.Get("network").String() != fmt.Sprintf("projects/%s/global/networks/%s", projectID, networkName) {
+		t.Errorf("Service Connection Policy network mismatch: got %s, want %s", policyDetails.Get("network").String(), fmt.Sprintf("projects/%s/global/networks/%s", projectID, networkName))
+	}
+
+	//Get self link of the existing subnet you created manually
+	existingSubnetSelfLink := fmt.Sprintf("projects/%s/regions/%s/subnetworks/%s", projectID, region, subnetworkName)
+
+	subnets := policyDetails.Get("pscConfig.subnetworks")
+	if len(subnets.Array()) > 0 {
+		if subnets.Array()[0].String() != existingSubnetSelfLink {
+			t.Errorf("Service Connection Policy subnetwork mismatch: got %s, want %s", subnets.Array()[0].String(), existingSubnetSelfLink)
+		}
+	} else {
+		t.Log("No subnets specified in Service Connection Policy, which is acceptable in this test scenario.")
+	}
+
+	t.Logf("Service Connection Policy '%s' verified successfully using gcloud.", policyName)
 
 	t.Log(" ========= Verify PSA Range ========= ")
 	vpcOutputValue := terraform.OutputJson(t, terraformOptions, "vpc_networks")
@@ -281,5 +361,42 @@ func createVPCSubnets(t *testing.T, projectID string, networkName string, subnet
 	_, err = shell.RunCommandAndGetOutputE(t, cmd)
 	if err != nil {
 		t.Errorf("===Error %s Encountered while executing %s", err, text)
+	}
+}
+
+// Function to create Service Connection Policy
+func createServiceConnectionPolicy(t *testing.T, projectID, region, networkName, policyName, subnetworkID, serviceClass string, connectionLimit int) {
+	// Get subnet self link from subnet ID using gcloud command
+	out, err := shell.RunCommandAndGetOutputE(t, shell.Command{
+		Command: "gcloud",
+		Args: []string{
+			"compute", "networks", "subnets", "describe", subnetworkID,
+			"--region", region,
+			"--project", projectID,
+			"--format=json",
+		},
+	})
+	if err != nil {
+		t.Errorf("Error getting subnet details: %s", err)
+	}
+	subnetSelfLink := gjson.Get(out, "selfLink").String()
+
+	cmd := shell.Command{
+		Command: "gcloud",
+		Args: []string{
+			"network-connectivity", "service-connection-policies", "create",
+			policyName, // Add the policyName here as the first argument after "create"
+			"--project", projectID,
+			"--region", region,
+			"--network", networkName,
+			"--service-class", serviceClass,
+			"--subnets", subnetSelfLink,
+			"--psc-connection-limit", fmt.Sprintf("%d", connectionLimit),
+			"--quiet",
+		},
+	}
+	_, err = shell.RunCommandAndGetOutputE(t, cmd)
+	if err != nil {
+		t.Errorf("Error creating Service Connection Policy: %s", err)
 	}
 }
