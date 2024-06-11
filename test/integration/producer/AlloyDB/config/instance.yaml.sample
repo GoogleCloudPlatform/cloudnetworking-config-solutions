@@ -1,0 +1,17 @@
+cluster_id: cid-4915955890040594730-test
+cluster_display_name: "4915955890040594730"
+project_id: <PROJECT_ID>
+region: us-central1
+network_id: projects/<PROJECT_ID>/global/networks/vpc-4915955890040594730-test
+allocated_ip_range: psatestrange
+cluster_labels:
+  key: value
+primary_instance:
+  instance_id : id-4915955890040594730-test
+  display_name : id-4915955890040594730-test
+  instance_type : PRIMARY
+  machine_cpu_count : 2
+  database_flags : null
+read_pool_instance : null
+automated_backup_policy : null
+deletion_protection: false

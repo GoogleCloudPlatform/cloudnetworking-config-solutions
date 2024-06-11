@@ -1,0 +1,17 @@
+cluster_id: dummy-cluster-id
+cluster_display_name: dummy
+project_id: dummy-serviceproject-id
+region: us-central1
+network_id: projects/dummy-serviceproject-id/global/networks/dummy-vpc-name
+allocated_ip_range: dummyrange
+cluster_labels:
+  key: value
+primary_instance:
+  instance_id : dummy-instance-id
+  display_name : dummy-instance-name
+  instance_type : PRIMARY
+  machine_cpu_count : 2
+  database_flags : null
+read_pool_instance : null
+automated_backup_policy : null
+deletion_protection: false
