@@ -9,11 +9,6 @@ subnets = [
     ip_cidr_range = ""
     name          = ""
     region        = ""
-  },
-  {
-    ip_cidr_range = ""
-    name          = ""
-    region        = ""
   }
 ]
 
