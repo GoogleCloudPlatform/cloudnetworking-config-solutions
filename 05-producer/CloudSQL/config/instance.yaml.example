@@ -1,0 +1,8 @@
+name: <instance-name>
+project_id: <project-id>
+region: us-central1
+database_version: <database-version-id> #e.g. : POSTGRES_15
+network_config:
+  connectivity:
+    psa_config:
+      private_network : <network-id>    #e.g. : projects/<project-id>/global/networks/<network-name>
