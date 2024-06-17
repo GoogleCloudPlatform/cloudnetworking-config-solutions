@@ -8,7 +8,7 @@ This solution utilizes a modular approach, with the gce.tf file defining a Terra
 
 ## Pre-Requisites
 
-### Prior Step Completion : 
+### Prior Step Completion :
 
 - **Completed Prior Stages:** Successful deployment of GCE resources depends on the completion of the following stages:
 
@@ -39,7 +39,7 @@ Have Terraform installed on your local machine. To install Terraform, follow the
 
 ## Execution Steps
 
-1. **Configuration** : 
+1. **Configuration** :
 
     - Create YAML configuration files (e.g., instance1.yaml, instance2.yaml) in the configs directory (or the path specified in the config_folder_path variable).
     - Edit the YAML files to specify the desired VM configurations. (See **Examples** below)
@@ -156,7 +156,6 @@ No resources.
 | <a name="input_attached_disks"></a> [attached\_disks](#input\_attached\_disks) | Additional disks, if options is null defaults will be used in its place. Source type is one of 'image' (zonal disks in vms and template), 'snapshot' (vm), 'existing', and null. | <pre>list(object({<br>    name        = string<br>    device_name = optional(string)<br>    # TODO: size can be null when source_type is attach<br>    size              = string<br>    snapshot_schedule = optional(string)<br>    source            = optional(string)<br>    source_type       = optional(string)<br>    options = optional(<br>      object({<br>        auto_delete  = optional(bool, false)<br>        mode         = optional(string, "READ_WRITE")<br>        replica_zone = optional(string)<br>        type         = optional(string, "pd-balanced")<br>      }),<br>      {<br>        auto_delete  = true<br>        mode         = "READ_WRITE"<br>        replica_zone = null<br>        type         = "pd-balanced"<br>      }<br>    )<br>  }))</pre> | `[]` | no |
 | <a name="input_boot_disk"></a> [boot\_disk](#input\_boot\_disk) | Boot disk properties. | <pre>object({<br>    auto_delete       = optional(bool, true)<br>    snapshot_schedule = optional(string)<br>    source            = optional(string)<br>    initialize_params = optional(object({<br>      image = optional(string, "projects/debian-cloud/global/images/family/debian-11")<br>      size  = optional(number, 10)<br>      type  = optional(string, "pd-balanced")<br>    }))<br>    use_independent_disk = optional(bool, false)<br>  })</pre> | <pre>{<br>  "initialize_params": {}<br>}</pre> | no |
 | <a name="input_can_ip_forward"></a> [can\_ip\_forward](#input\_can\_ip\_forward) | Enable IP forwarding. | `bool` | `false` | no |
-| <a name="input_confidential_compute"></a> [confidential\_compute](#input\_confidential\_compute) | Enable Confidential Compute for these instances. | `bool` | `false` | no |
 | <a name="input_config_folder_path"></a> [config\_folder\_path](#input\_config\_folder\_path) | Location of YAML files holding GCE configuration values. | `string` | `"./configs"` | no |
 | <a name="input_create_template"></a> [create\_template](#input\_create\_template) | Create instance template instead of instances. | `bool` | `false` | no |
 | <a name="input_description"></a> [description](#input\_description) | Description of a Compute Instance. | `string` | `"Managed by the compute-vm Terraform module."` | no |
