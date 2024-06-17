@@ -126,12 +126,6 @@ variable "image" {
   default     = "projects/debian-cloud/global/images/family/debian-11"
 }
 
-variable "confidential_compute" {
-  description = "Enable Confidential Compute for these instances."
-  type        = bool
-  default     = false
-}
-
 variable "create_template" {
   description = "Create instance template instead of instances."
   type        = bool
