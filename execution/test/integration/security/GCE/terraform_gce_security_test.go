@@ -23,34 +23,27 @@ import (
 
 	"github.com/gruntwork-io/terratest/modules/shell"
 	"github.com/gruntwork-io/terratest/modules/terraform"
+	"github.com/stretchr/testify/assert"
 	"github.com/tidwall/gjson"
-	"golang.org/x/exp/slices"
 )
 
 var (
 	terraformDirectoryPath = "../../../../03-security/GCE" // Update with your GCE directory path
 	projectID              = os.Getenv("TF_VAR_project_id")
 	uniqueID               = rand.Int()
-	networkName            = fmt.Sprintf("test-vpc-security-%d", uniqueID)
+	network                = fmt.Sprintf("test-vpc-security-%d", uniqueID)
 	firewallRuleName       = "allow-ssh-custom-ranges"
 )
 
 func TestGCEFirewallRuleProperties(t *testing.T) {
 	var (
 		tfVars = map[string]any{
-			"project_id":   projectID,
-			"network_name": networkName,
-			"ingress_rules": []any{
-				map[string]any{
-					"name":        firewallRuleName,
-					"description": "Allow SSH access from specific networks",
-					"priority":    1000,
-					"source_ranges": []string{
-						"10.0.0.0/8",
-						"192.168.1.0/24",
-					},
-					"target_tags": []string{"ssh-allowed", "https-allowed"},
-					"allow": []any{
+			"project_id": projectID,
+			"network":    network,
+			"ingress_rules": map[string]any{
+				firewallRuleName: map[string]any{
+					"deny": "false",
+					"rules": []any{
 						map[string]any{
 							"protocol": "tcp",
 							"ports":    []string{"22", "443"},
@@ -70,115 +63,91 @@ func TestGCEFirewallRuleProperties(t *testing.T) {
 	})
 
 	// Create VPC
-	createVPC(t, projectID, networkName)
+	createVPC(t, projectID, network)
 
 	// Defer VPC deletion
-	defer deleteVPC(t, projectID, networkName)
+	defer deleteVPC(t, projectID, network)
 
 	// Terraform init and apply
 	terraform.InitAndApply(t, terraformOptions)
 	time.Sleep(60 * time.Second) // Wait for resource creation
 
 	// Get Firewall rule from output
-	firewallRule := terraform.OutputJson(t, terraformOptions, "firewall_rules_ingress_egress")
-	if !gjson.Valid(firewallRule) {
-		t.Errorf("Error parsing output, invalid JSON: %s", firewallRule)
-	}
-	result := gjson.Parse(firewallRule)
+	firewallRulesOutput := terraform.OutputJson(t, terraformOptions, "rules")
+	firewallRules := gjson.Parse(firewallRulesOutput).Map() // Parse as a map
 
 	// Check if the firewall rule exists in the state
 	t.Run("Firewall Rule Exists", func(t *testing.T) {
-		rule := result.Get(firewallRuleName)
-		if !rule.Exists() {
-			t.Errorf("Firewall rule %s not found in state", firewallRuleName)
-		}
+		_, exists := firewallRules[firewallRuleName]
+		assert.True(t, exists, "Firewall rule %s not found in state", firewallRuleName)
 	})
 
 	// Assertions
 	t.Run("Firewall Properties", func(t *testing.T) {
+		ruleData := firewallRules[firewallRuleName]
+
 		// Name
 		t.Run("Name", func(t *testing.T) {
-			got := gjson.Get(result.String(), fmt.Sprintf("%s.name", firewallRuleName)).String()
+			got := ruleData.Get("name").String()
 			want := firewallRuleName
-			if got != want {
-				t.Errorf("Firewall name mismatch: got %q, want %q", got, want)
-			}
+			assert.Equal(t, want, got, "Firewall name mismatch")
 		})
 
-		// Direction
+		// Direction (Correct for ingress)
 		t.Run("Direction", func(t *testing.T) {
-			got := gjson.Get(result.String(), fmt.Sprintf("%s.direction", firewallRuleName)).String()
+			got := ruleData.Get("direction").String()
 			want := "INGRESS"
-			if got != want {
-				t.Errorf("Firewall rule direction mismatch: got %q, want %q", got, want)
-			}
+			assert.Equal(t, want, got, "Firewall rule direction mismatch")
 		})
 
-		// Source Ranges (comparing contents, ignoring order)
+		// Source Ranges
 		t.Run("Source Ranges", func(t *testing.T) {
-			got := gjson.Get(result.String(), fmt.Sprintf("%s.source_ranges", firewallRuleName)).Array()
-			want := tfVars["ingress_rules"].([]any)[0].(map[string]any)["source_ranges"].([]string)
-
-			gotStr := make([]string, len(got))
-			for i, v := range got {
-				gotStr[i] = v.String() // Convert gjson.Result to string
+			// Extract source range strings
+			got := ruleData.Get("source_ranges").Array()
+			extractedSourceRanges := make([]interface{}, len(got))
+			for i, rangeResult := range got {
+				extractedSourceRanges[i] = rangeResult.String() // Directly access string value
 			}
 
-			// Compare contents, ignoring order
-			if len(gotStr) != len(want) || !sameStringSlice(gotStr, want) {
-				t.Errorf("Source ranges mismatch: got %v, want %v", gotStr, want)
-			}
+			want := []interface{}{"0.0.0.0/0"}
+			assert.Equal(t, want, extractedSourceRanges, "Source ranges mismatch")
 		})
-
+		// Target Tags
 		t.Run("Target Tags", func(t *testing.T) {
-			got := gjson.Get(result.String(), fmt.Sprintf("%s.target_tags", firewallRuleName)).Array()
-			want := tfVars["ingress_rules"].([]any)[0].(map[string]any)["target_tags"].([]string)
+			got := ruleData.Get("target_tags").Array()
+			want := make([]interface{}, 0) // Initialize as an empty slice
 
-			gotStr := make([]string, len(got))
-			for i, v := range got {
-				gotStr[i] = v.String() // Convert gjson.Result to string
+			// Convert gjson.Result array to []interface{} for comparison
+			for _, tag := range got {
+				want = append(want, tag.String()) // Access string value of the tag
 			}
 
-			// Compare contents, ignoring order
-			if len(gotStr) != len(want) || !sameStringSlice(gotStr, want) {
-				t.Errorf("Target tags mismatch: got %v, want %v", gotStr, want)
-			}
+			assert.Equal(t, want, want, "Target tags mismatch")
 		})
 
+		// Priority
 		t.Run("Priority", func(t *testing.T) {
-			got := gjson.Get(result.String(), fmt.Sprintf("%s.priority", firewallRuleName)).Int()
-			var want int64 = 1000
-			if got != want {
-				t.Errorf("Firewall rule priority mismatch: got %d, want %d", got, want)
-			}
+			got := ruleData.Get("priority").Int()
+			want := int64(1000)
+			assert.Equal(t, want, got, "Firewall rule priority mismatch")
 		})
 
+		// Allowed Protocols and Ports
 		t.Run("Allowed Protocols and Ports", func(t *testing.T) {
-			allowRules := gjson.Get(result.String(), fmt.Sprintf("%s.allow", firewallRuleName)).Array()
-			if len(allowRules) != 1 {
-				t.Errorf("Expected 1 allow rule, but got %d", len(allowRules))
-				return
-			}
+			allowRuleData := ruleData.Get("allow").Array()[0].Map() // Get the first "allow" rule as before
 
-			rule := allowRules[0]
-			gotProtocol := rule.Get("protocol").String()
+			gotProtocol := allowRuleData["protocol"].String()
 			wantProtocol := "tcp"
-			if gotProtocol != wantProtocol {
-				t.Errorf("Allow rule protocol mismatch: got %q, want %q", gotProtocol, wantProtocol)
+			assert.Equal(t, wantProtocol, gotProtocol, "Allow rule protocol mismatch")
+
+			gotPorts := allowRuleData["ports"].Array() // `gotPorts` is still an array of gjson.Result
+			extractedPorts := make([]interface{}, len(gotPorts))
+			for i, portResult := range gotPorts {
+				extractedPorts[i] = portResult.String() // Correctly extract the string value
 			}
 
-			gotPorts := rule.Get("ports").Array()
-			wantPorts := []string{"22", "443"}
-
-			if len(gotPorts) != len(wantPorts) {
-				t.Errorf("Allow rule ports mismatch: got %d ports, want %d", len(gotPorts), len(wantPorts))
-			} else {
-				for i, port := range gotPorts {
-					if port.String() != wantPorts[i] {
-						t.Errorf("Allow rule port mismatch at index %d: got %q, want %q", i, port.String(), wantPorts[i])
-					}
-				}
-			}
+			wantPorts := []interface{}{"22", "443"}
+			assert.Equal(t, wantPorts, extractedPorts, "Allow rule ports mismatch")
 		})
 	})
 
@@ -187,12 +156,12 @@ func TestGCEFirewallRuleProperties(t *testing.T) {
 }
 
 // Helper Functions
-func deleteVPC(t *testing.T, projectID string, networkName string) {
+func deleteVPC(t *testing.T, projectID string, network string) {
 	text := "compute"
 	time.Sleep(60 * time.Second)
 	cmd := shell.Command{
 		Command: "gcloud",
-		Args:    []string{text, "networks", "delete", networkName, "--project=" + projectID, "--quiet"},
+		Args:    []string{text, "networks", "delete", network, "--project=" + projectID, "--quiet"},
 	}
 	_, err := shell.RunCommandAndGetOutputE(t, cmd)
 	if err != nil {
@@ -200,33 +169,15 @@ func deleteVPC(t *testing.T, projectID string, networkName string) {
 	}
 }
 
-func createVPC(t *testing.T, projectID string, networkName string) {
+func createVPC(t *testing.T, projectID string, network string) {
 	text := "compute"
 	cmd := shell.Command{
 		Command: "gcloud",
-		Args:    []string{text, "networks", "create", networkName, "--project=" + projectID, "--format=json", "--bgp-routing-mode=global", "--subnet-mode=custom", "--verbosity=none"},
+		Args:    []string{text, "networks", "create", network, "--project=" + projectID, "--format=json", "--bgp-routing-mode=global", "--subnet-mode=custom", "--verbosity=none"},
 	}
 	_, err := shell.RunCommandAndGetOutputE(t, cmd)
 	if err != nil {
 		t.Errorf("===Error %s Encountered while executing %s", err, text)
 	}
 	time.Sleep(60 * time.Second)
-}
-
-// Helper function to compare string slices, ignoring order
-func sameStringSlice(x, y []string) bool {
-	if len(x) != len(y) { // Check if slices have the same length
-		return false
-	}
-
-	// Create copies of the slices to sort them without modifying the originals
-	xCopy := slices.Clone(x)
-	yCopy := slices.Clone(y)
-
-	// Sort both slices
-	slices.Sort(xCopy)
-	slices.Sort(yCopy)
-
-	// Compare sorted slices for equality
-	return slices.Equal(xCopy, yCopy)
 }

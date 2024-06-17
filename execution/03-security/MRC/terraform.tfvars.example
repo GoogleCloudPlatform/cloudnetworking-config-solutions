@@ -5,7 +5,7 @@ egress_rules = {
     deny = false
     rules = [{
       protocol = "tcp"
-      ports    = ["3306"]
+      ports    = ["6379"]
     }]
   }
 }
