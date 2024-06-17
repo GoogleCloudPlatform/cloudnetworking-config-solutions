@@ -1,0 +1,6 @@
+redis_cluster_name: test-cluster-redis
+project_id: project-ID
+shard_count: 3 # based on the shard requirement
+network_id: projects/project-ID/global/networks/network-name # should be in format projects/{project_id}/global/networks/{network_name}
+region: <region> # example is us-central1
+replica_count: 0 # based on the replica requirement

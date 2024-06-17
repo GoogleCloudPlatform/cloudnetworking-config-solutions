@@ -1,0 +1,7 @@
+name: instance1
+project_id: <project-id>
+region : us-central1
+zone: us-central1-a
+image: ubuntu-os-cloud/ubuntu-2204-lts
+network: projects/<project-id>/global/networks/<network-name>
+subnetwork: projects/<project-id>/regions/us-central1/subnetworks/<subnetwork-name>

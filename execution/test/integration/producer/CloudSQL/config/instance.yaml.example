@@ -1,0 +1,12 @@
+name: <instance-name>
+project_id: <project-id>
+region: us-central1
+database_version: POSTGRES_15
+network_config:
+  connectivity:
+    psa_config:
+      private_network: projects/<project-id>/global/networks/<network-name>
+      allocated_ip_ranges:
+        primary: <psa-range-name>
+terraform_deletion_protection: false
+gcp_deletion_protection: false

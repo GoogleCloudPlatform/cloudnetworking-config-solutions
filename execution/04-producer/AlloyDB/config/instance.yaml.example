@@ -1,0 +1,14 @@
+cluster_id: <your-cluster-id-here>
+cluster_display_name: <your-cluster-display-name-here>
+project_id: <your-project-id>
+region: us-central1
+network_id: <your-network-id> #e.g. : projects/<your-project-id>/global/networks/<your-network-name>
+allocated_ip_range: range1
+primary_instance:
+  instance_id : <your-instance-id-here>
+  display_name : <your-instance-display-name-here>
+  instance_type : PRIMARY
+  machine_cpu_count : 2
+  database_flags : null
+read_pool_instance : null
+automated_backup_policy : null
