@@ -365,21 +365,9 @@ func createVPCSubnets(t *testing.T, projectID string, networkName string, subnet
 }
 
 // Function to create Service Connection Policy
-func createServiceConnectionPolicy(t *testing.T, projectID, region, networkName, policyName, subnetworkID, serviceClass string, connectionLimit int) {
+func createServiceConnectionPolicy(t *testing.T, projectID string, region string, networkName string, policyName string, subnetworkName string, serviceClass string, connectionLimit int) {
 	// Get subnet self link from subnet ID using gcloud command
-	out, err := shell.RunCommandAndGetOutputE(t, shell.Command{
-		Command: "gcloud",
-		Args: []string{
-			"compute", "networks", "subnets", "describe", subnetworkID,
-			"--region", region,
-			"--project", projectID,
-			"--format=json",
-		},
-	})
-	if err != nil {
-		t.Errorf("Error getting subnet details: %s", err)
-	}
-	subnetSelfLink := gjson.Get(out, "selfLink").String()
+	subnetSelfLink := fmt.Sprintf("https://www.googleapis.com/compute/v1/projects/%s/regions/%s/subnetworks/%s",projectID,region,subnetworkName)
 
 	cmd := shell.Command{
 		Command: "gcloud",
@@ -395,7 +383,7 @@ func createServiceConnectionPolicy(t *testing.T, projectID, region, networkName,
 			"--quiet",
 		},
 	}
-	_, err = shell.RunCommandAndGetOutputE(t, cmd)
+	_, err := shell.RunCommandAndGetOutputE(t, cmd)
 	if err != nil {
 		t.Errorf("Error creating Service Connection Policy: %s", err)
 	}

@@ -32,7 +32,7 @@ var (
 	projectID              = os.Getenv("TF_VAR_project_id")
 	uniqueID               = rand.Int()
 	network                = fmt.Sprintf("test-vpc-security-%d", uniqueID)
-	firewallRuleName       = "allow-ssh-custom-ranges"
+	firewallRuleName       = "allow-ssh-custom-ranges-gce"
 )
 
 func TestGCEFirewallRuleProperties(t *testing.T) {
