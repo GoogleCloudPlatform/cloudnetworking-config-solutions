@@ -12,7 +12,7 @@ provider "google-beta" {
 terraform {
   backend "gcs" {
     bucket                      = "ENTER_TF_BUCKET_NAME"
-    prefix                      = "ENTER_TF_CONSUMER_GCE_PREFIX"
+    prefix                      = "ENTER_TF_SECURITY_GCE_PREFIX"
     impersonate_service_account = "ENTER_TF_SERVICE_ACCOUNT"
   }
 }
