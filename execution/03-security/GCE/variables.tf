@@ -17,35 +17,75 @@ variable "project_id" {
   description = "The ID of the Google Cloud project."
 }
 
-variable "network_name" {
+variable "network" {
   type        = string
   description = "The name (or self-link) of the network to create the firewall rule in."
 }
 
-variable "ingress_rules" {
-  type = list(object({
-    name                    = string
-    description             = optional(string, null)
-    disabled                = optional(bool, null)
-    priority                = optional(number, null)
-    destination_ranges      = optional(list(string), [])
-    source_ranges           = optional(list(string), [])
-    source_tags             = optional(list(string))
-    source_service_accounts = optional(list(string))
-    target_tags             = optional(list(string))
-    target_service_accounts = optional(list(string))
+variable "default_rules_config" {
+  description = "Optionally created convenience rules. Set the 'disabled' attribute to true, or individual rule attributes to empty lists to disable."
+  type = object({
+    admin_ranges = optional(list(string))
+    disabled     = optional(bool, true)
+    http_ranges = optional(list(string), [
+      "35.191.0.0/16", "130.211.0.0/22", "209.85.152.0/22", "209.85.204.0/22"]
+    )
+    http_tags = optional(list(string), ["http-server"])
+    https_ranges = optional(list(string), [
+      "35.191.0.0/16", "130.211.0.0/22", "209.85.152.0/22", "209.85.204.0/22"]
+    )
+    https_tags = optional(list(string), ["https-server"])
+    ssh_ranges = optional(list(string), ["35.235.240.0/20"])
+    ssh_tags   = optional(list(string), ["ssh"])
+  })
+  default = {
+    disabled = true
+  }
+}
 
-    allow = optional(list(object({
-      protocol = string
-      ports    = optional(list(string))
-    })), [])
-    deny = optional(list(object({
-      protocol = string
-      ports    = optional(list(string))
-    })), [])
-    log_config = optional(object({
-      metadata = string
+variable "ingress_rules" {
+  description = "List of ingress rule definitions, default to allow action. Null source ranges will be replaced with 0/0."
+  type = map(object({
+    deny               = optional(bool, false)
+    description        = optional(string)
+    destination_ranges = optional(list(string), []) # empty list is needed as default to allow deletion after initial creation with a value. See https://github.com/hashicorp/terraform-provider-google/issues/14270
+    disabled           = optional(bool, false)
+    enable_logging = optional(object({
+      include_metadata = optional(bool)
     }))
+    priority             = optional(number, 1000)
+    source_ranges        = optional(list(string))
+    sources              = optional(list(string))
+    targets              = optional(list(string))
+    use_service_accounts = optional(bool, false)
+    rules = optional(list(object({
+      protocol = string
+      ports    = optional(list(string))
+    })), [{ protocol = "all" }])
   }))
-  description = "List of ingress rules. This will be ignored if variable 'rules' is non-empty"
+  default  = {}
+  nullable = false
+}
+
+variable "egress_rules" {
+  description = "List of egress rule definitions, default to deny action. Null destination ranges will be replaced with 0/0."
+  type = map(object({
+    deny               = optional(bool, true)
+    description        = optional(string)
+    destination_ranges = optional(list(string))
+    disabled           = optional(bool, false)
+    enable_logging = optional(object({
+      include_metadata = optional(bool)
+    }))
+    priority             = optional(number, 1000)
+    source_ranges        = optional(list(string))
+    targets              = optional(list(string))
+    use_service_accounts = optional(bool, false)
+    rules = optional(list(object({
+      protocol = string
+      ports    = optional(list(string))
+    })), [{ protocol = "all" }])
+  }))
+  default  = {}
+  nullable = false
 }

@@ -13,10 +13,10 @@
 # limitations under the License.
 
 module "ssh_firewall" {
-  source  = "terraform-google-modules/network/google//modules/firewall-rules"
-  version = "9.1.0"
-
-  project_id    = var.project_id
-  network_name  = var.network_name
-  ingress_rules = var.ingress_rules
+  source               = "github.com/GoogleCloudPlatform/cloud-foundation-fabric//modules/net-vpc-firewall?ref=v30.0.0"
+  project_id           = var.project_id
+  network              = var.network
+  default_rules_config = var.default_rules_config
+  ingress_rules        = var.ingress_rules
+  egress_rules         = var.egress_rules
 }
