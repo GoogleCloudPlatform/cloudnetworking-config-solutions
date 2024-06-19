@@ -30,7 +30,7 @@ var (
 	region                 = "us-central1"
 	terraformDirectoryPath = "../../../../04-producer/AlloyDB"
 	configFolderPath       = "../../test/integration/producer/AlloyDB/config"
-	rangeName              = "psatestrange"
+	rangeName              = "psatestrangealloydb"
 	clusterDisplayName     = fmt.Sprint(rand.Int())
 	networkName            = fmt.Sprintf("vpc-%s-test", clusterDisplayName)
 	alloyDBClusterId       = fmt.Sprintf("cid-%s-test", clusterDisplayName)

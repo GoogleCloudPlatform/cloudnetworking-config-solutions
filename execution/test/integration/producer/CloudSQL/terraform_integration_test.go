@@ -30,7 +30,7 @@ var (
 	region                 = "us-central1"
 	terraformDirectoryPath = "../../../../04-producer/CloudSQL"
 	configFolderPath       = "../../test/integration/producer/CloudSQL/config"
-	rangeName              = "psatestrange"
+	rangeName              = "psatestrangecloudsql"
 	databaseVersion        = "POSTGRES_15"
 	name                   = fmt.Sprintf("cloudsql-%d", rand.Int())
 	networkName            = fmt.Sprintf("vpc-%s-test", name)
