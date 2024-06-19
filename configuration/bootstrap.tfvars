@@ -1,6 +1,6 @@
-bootstrap_project_id                  = "<your-bootstrap-project-id>"
-network_hostproject_id                = "<your-host-project-id>"
-network_serviceproject_id             = "<your-service(producer/consumer)-project-id>"
+bootstrap_project_id                  = ""
+network_hostproject_id                = ""
+network_serviceproject_id             = "" // <service(producer/consumer)-project-id>
 organization_stage_administrator      = ["user:user-example@example.com"]
 networking_stage_administrator        = ["user:user-example@example.com"]
 security_stage_administrator          = ["user:user-example@example.com"]

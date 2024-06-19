@@ -1,22 +1,138 @@
+# Networking Stage
+
+## Overview
+
+This Terraform configuration provides a flexible and robust framework for deploying and managing essential networking components within your Google Cloud Platform (GCP) environment. It empowers you to create a secure, highly available, and customizable network infrastructure that aligns with your organization's specific requirements.
+
+Key features of this configuration include:
+
+- **Virtual Private Cloud (VPC) Network**: Establish a custom VPC network tailored to your needs. Designate subnets for different purposes, manage routing tables, and leverage Private Service Access (PSA) for seamless communication with Google-managed services.- **Service Connection Policies (SCP)**: Implements Private Service Connect to automate private connectivity to a managed service.
+- **High Availability VPN (HA VPN)**: Create redundant VPN tunnels for secure, resilient site-to-site connectivity. Leverage BGP for dynamic routing and optimal path selection.
+- **Cloud NAT**: Enable private Google Compute Engine (GCE) instances within your VPC to access the internet while maintaining the security of private IP addresses.
+
+
+### Benefits 
+
+- High Availability: This configuration promotes high availability through redundant VPN tunnels and strategically placed subnets.
+- Modularity: The modular structure of this configuration allows you to easily add or remove components as needed.
+- PSA and PSC configuration : This module allows you to use either or both PSA (Service Networking) and PSC (Private Service Connectivity) for your large scale deployments.
+
 ## Prerequisites
 
-<ol>
-  <li>
-      A Google Cloud project specifically set up to accommodate Google Cloud networking should exist.
-  </li>
-  <li>Following are the list of API's that should be enabled : <br>
-      "iam.googleapis.com",<br>
-      "compute.googleapis.com",<br>
-      "logging.googleapis.com",<br>
-      "monitoring.googleapis.com",<br>
-      "servicenetworking.googleapis.com",<br>
-  </li>
-  <li> User or Service Account should have the following IAM permissions in the networking project ID : <br>
-      <br> "roles/compute.networkAdmin",
-      <br> "roles/compute.xpnAdmin",
-      <br> If you want to connect to an HA VPN gateway that resides in a Google Cloud organization or project that you don't own, request the compute.vpnGateways.use permission from the owner.
-  </li>
-</ol>
+- Before creating networking resources, ensure you have the completed the following pre-requsites:
+
+1. **Completed Prior Stages:** Successful deployment of networking resources depends on the completion of the following stages:
+    * **01-organization:** This stage handles the activation of required Google Cloud APIs.
+
+2. Enable the following APIs : 
+
+- [Compute Engine API](https://cloud.google.com/compute/docs/reference/rest/v1): Used for creating and managing VPC networks, subnets, forwarding rules, HA VPN tunnels/gateways, Cloud NAT and firewall rules.
+- [Service Networking API](https://cloud.google.com/service-infrastructure/docs/service-networking/getting-started): to manage Private Service Access (PSA) configurations.
+- [Network Connectivity API](https://cloud.google.com/network-connectivity/docs/reference/networkconnectivity/rest)
+    - Enables connectivity with and between Google Cloud resources.
+- [Service Consumer Management API](https://cloud.google.com/service-infrastructure/docs/service-consumer-management/reference/rest) : enabled in the project that Private Service Connect endpoints are deployed in. This API lets Google Cloud create the Network Connectivity Service Account that deploys Private Service Connect endpoints.
+
+3. Permissions required for this stage : 
+
+    - [Compute Network Admin](https://cloud.google.com/iam/docs/understanding-roles#compute.networkAdmin) : roles/compute.networkAdmin : Grants full control over VPC networks, subnets, firewall rules, and related resources.
+    - [Compute Shared VPN Admin](https://cloud.google.com/compute/docs/access/iam#compute.xpnAdmin) : roles/compute.xpnAdmin : Permissions to administer shared VPC host projects, specifically enabling the host projects and associating shared VPC service projects to the host project's network.
+
+## Components
+
+- `ha-vpn.tf`: 
+    - Defines the HA VPN gateway, creating two redundant tunnels for high availability.
+    - Configures BGP sessions for dynamic routing between your on-premises network and GCP.
+    - Manages custom route advertisement to control traffic flow.
+
+- `nat.tf`: Sets up the Cloud NAT gateway and associates it with the VPC network.
+    - Sets up a Cloud NAT gateway to provide internet access for instances in your private subnets.
+    - Configures NAT routing to direct outbound traffic to the internet.
+
+- `scp.tf`: Defines SCP for provisioning Private Service Connectivity to services like Memorystore for Redis Clusters.
+    - Automates private connectivity to a managed service.
+
+- `vpc.tf`: Creates the VPC network, subnets, and routing configuration.
+    - Creates a VPC network with specified subnets and IP ranges.
+    - Configures routing tables, including custom routes for PSA if required.
+    - Supports Private Service Access (PSA) for private connectivity to Google-managed services.
+
+- `locals`.tf: Defines local variables for use within the configuration.
+
+- `output.tf`: Provides outputs for easy access to information about the created resources.
+
+- `variables`.tf: Defines input variables for customizing the network configuration.
+
+## Configuration
+
+To configure networking.tfvars for your environment, here's an example which can be used for your reference : 
+
+```
+project_id = "gcp-project-id"
+region     = "us-central1"
+
+## VPC input variables
+
+network_name = "network"
+subnets = [
+  {
+    ip_cidr_range = "10.0.1.0/16"
+    name          = "subnet1"
+    region        = "us-central1-a"
+  },
+  {
+    ip_cidr_range = "192.168.0.1/16"
+    name          = "subnet2"
+    region        = "us-central1-b"
+  }
+]
+
+# PSC/Service Connecitvity Variables
+
+create_scp_policy      = true
+subnets_for_scp_policy = ["subnet1"] 
+
+## Cloud Nat input variables
+create_nat = true
+
+## Cloud HA VPN input variables
+
+create_havpn = false
+peer_gateways = {
+  default = {
+    gcp = "" # e.g. projects/<google-cloud-peer-projectid>/regions/<google-cloud-region>/vpnGateways/<peer-vpn-name>
+  }
+}
+
+tunnel_1_router_bgp_session_range = "ip-cidr-range"
+tunnel_1_bgp_peer_asn             = 64514
+tunnel_1_bgp_peer_ip_address      = "ip-from-the-cidr-range"
+tunnel_1_shared_secret            = "secret1"
+
+tunnel_2_router_bgp_session_range = "ip-cidr-range"
+tunnel_2_bgp_peer_asn             = 64514
+tunnel_2_bgp_peer_ip_address      = "ip-from-the-cidr-range"
+tunnel_2_shared_secret            = "secret2"
+```
+
+## Usage
+
+**NOTE** : run the terraform commands with the `-var-file` referencing the networking.tfvars present under the /configuration folder. Example : 
+
+```
+terraform plan -var-file=../configuration/networking.tfvars
+terraform apply -var-file=../configuration/networking.tfvars
+```
+
+- Initialize: Run `terraform init`.
+- Plan: Run `terraform plan -var-file=../configuration/networking.tfvars` to review the planned changes.
+- Apply:  If the plan looks good, run `terraform apply -var-file=../configuration/networking.tfvars` to create or update the resources.
+
+
+## Notes
+
+- Dependencies: Ensure that the required GCP services are enabled in your project.
+- Resource Names: Choose unique names to avoid conflicts.
+- Security: Review the default firewall rules and SCPs to ensure they align with your security requirements.
 
 
 <!-- BEGIN_TF_DOCS -->
