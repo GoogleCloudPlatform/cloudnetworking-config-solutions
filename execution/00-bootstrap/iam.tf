@@ -17,11 +17,26 @@
  Service Account used to run Organization Stage
 *********************************************/
 module "organization" {
-  source     = "github.com/GoogleCloudPlatform/cloud-foundation-fabric//modules/iam-service-account?ref=v31.1.0"
+  source     = "github.com/GoogleCloudPlatform/cloud-foundation-fabric//modules/iam-service-account?ref=v34.1.0"
   project_id = var.bootstrap_project_id
   name       = var.organization_sa_name
   iam = {
     "roles/iam.serviceAccountTokenCreator" = var.organization_stage_administrator
+  }
+  iam_project_roles = {
+    (var.network_hostproject_id) = [
+      "roles/iam.serviceAccountUser",
+      "roles/serviceusage.serviceUsageAdmin",
+    ]
+    (var.network_serviceproject_id) = [
+      "roles/iam.serviceAccountUser",
+      "roles/serviceusage.serviceUsageAdmin",
+    ]
+  }
+  iam_storage_roles = {
+    (module.google_storage_bucket.name) = [
+      "roles/storage.objectAdmin"
+    ]
   }
 }
 /********************************************
@@ -34,9 +49,22 @@ module "networking" {
   iam = {
     "roles/iam.serviceAccountTokenCreator" = var.networking_stage_administrator
   }
+  iam_folder_roles = {
+    (var.folder_id) = [
+      "roles/compute.xpnAdmin",
+    ]
+  }
   iam_project_roles = {
     (var.network_hostproject_id) = [
-      "roles/compute.networkAdmin"
+      "roles/compute.networkAdmin",
+    ]
+    (var.network_serviceproject_id) = [
+      "roles/cloudsql.viewer"
+    ]
+  }
+  iam_storage_roles = {
+    (module.google_storage_bucket.name) = [
+      "roles/storage.objectAdmin"
     ]
   }
 }
@@ -117,6 +145,9 @@ module "consumer" {
     "roles/iam.serviceAccountTokenCreator" = var.consumer_stage_administrator
   }
   iam_project_roles = {
+    (var.network_hostproject_id) = [
+      "roles/compute.networkUser",
+    ]
     (var.network_serviceproject_id) = [
       "roles/compute.instanceAdmin.v1",
       "roles/iam.serviceAccountUser"
