@@ -1,7 +1,7 @@
 project_id = ""
 network    = ""
 egress_rules = {
-  allow-egress = {
+  allow-egress-alloydb = {
     deny = false
     rules = [{
       protocol = "tcp"
