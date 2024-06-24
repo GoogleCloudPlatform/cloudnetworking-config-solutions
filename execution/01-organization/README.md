@@ -15,8 +15,9 @@ With the prerequisites in place, you can now leverage Terraform to automate the 
 ### Execution Steps
 
 1. **Create your .tfvars files:**
-    * Refer the provided `terraform.tfvars.example` file or the [example section](#example) and create a new `terraform.tfvars`.
+    * Refer the provided `terraform.tfvars.example` file or the [example section](#example) to create a new `organisation.tfvars` under the configuration folder or use the existing `organisation.tfvars` under the configuration folder.
     * Fill in the values for project_id, activate_apis and other [input variables](#inputs)  according to your specific requirements. Ensure you are using the correct project_id for the project you wish to enable or disable APIs for.
+    * For desired producer/consumer **uncomment** the API that you wish to enable from the list of APIs provided in the organisation.tfvars in the configuration folder.
 
 2. **Initialize Terraform:**
 
