@@ -1,6 +1,6 @@
   activate_api_identities = {
     "project-01" = {
-      project_id = "your-project-id",
+      project_id = "project-id",
       activate_apis = [
         "servicenetworking.googleapis.com",
         "alloydb.googleapis.com",

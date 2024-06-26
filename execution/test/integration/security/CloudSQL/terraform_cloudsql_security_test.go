@@ -31,7 +31,7 @@ var (
 	projectID              = os.Getenv("TF_VAR_project_id")
 	uniqueID               = rand.Int() //included as a suffix to the VPC and subnet names.
 	networkName            = fmt.Sprintf("test-vpc-security-%d", uniqueID)
-	firewallName           = "test-allow-egress"
+	firewallName           = "test-allow-egress-cloudsql"
 	firewallDirection      = "EGRESS"
 )
 

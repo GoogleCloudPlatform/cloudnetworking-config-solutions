@@ -1,5 +1,5 @@
-project_id = ""
-network    = ""
+project_id = "<project-id>"
+network    = "projects/<project-id>/global/networks/<vpc-name>"
 egress_rules = {
   allow-egress = {
     deny = false

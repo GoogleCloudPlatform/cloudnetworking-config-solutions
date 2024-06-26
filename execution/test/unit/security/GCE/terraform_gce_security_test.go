@@ -4,7 +4,7 @@
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-//     http://www.apache.org/licenses/LICENSE-2.0
+//      http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -24,26 +24,18 @@ import (
 
 const (
 	terraformDirectoryPath = "../../../../03-security/GCE"
-	network                = "projects/dummy-project/global/networks/dummy-vpc-network01"
-	firewallRuleName       = "allow-ssh-custom-ranges-gce-test"
+	network                = "dummy-vpc-network01"
 )
 
 var (
 	projectID = "dummy-project-id"
 	tfVars    = map[string]any{
-		"project_id":   projectID,
-		"network_name": network,
-		"ingress_rules": []any{
-			map[string]any{
-				"name":        firewallRuleName,
-				"description": "Allow SSH access from specific networks",
-				"priority":    1000,
-				"source_ranges": []string{
-					"192.168.1.0/24", // Replace with your actual source ranges
-					"10.0.0.0/8",
-				},
-				"target_tags": []string{"ssh-allowed", "https-allowed"},
-				"allow": []any{
+		"project_id": projectID,
+		"network":    network,
+		"ingress_rules": map[string]any{
+			"allow-ingress": map[string]any{
+				"deny": false,
+				"rules": []any{
 					map[string]any{
 						"protocol": "tcp",
 						"ports":    []string{"22", "443"},

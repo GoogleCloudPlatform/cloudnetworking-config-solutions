@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-output "firewall_rules_ingress_egress" {
-  value       = module.ssh_firewall.firewall_rules_ingress_egress
-  description = "List of ingress/egress firewall rule(s) created."
+output "rules" {
+  description = "Map of firewall rules created."
+  value       = module.ssh_firewall.rules
 }

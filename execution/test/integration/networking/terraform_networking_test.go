@@ -255,12 +255,13 @@ func TestExistingVPCNetworkModule(t *testing.T) {
 	t.Logf("======= Verify Service Connection Policy using gcloud =======")
 
 	// Check if policy exists using gcloud describe
-	out, err := shell.RunCommandAndGetOutputE(t, shell.Command{
+	scpOutput, err := shell.RunCommandAndGetOutputE(t, shell.Command{
 		Command: "gcloud",
 		Args: []string{
 			"network-connectivity", "service-connection-policies", "describe", policyName,
 			"--project", projectID,
 			"--region", region,
+			"--verbosity=none",
 			"--format", "json", // Format output as JSON for easy parsing
 		},
 	})
@@ -269,16 +270,27 @@ func TestExistingVPCNetworkModule(t *testing.T) {
 		t.Errorf("Error: Service Connection Policy '%s' not found or could not be described: %s", policyName, err)
 	}
 
-	// Parse gcloud output using gjson
-	policyDetails := gjson.Parse(out)
-	expectedPolicyName := fmt.Sprintf("projects/%s/locations/%s/serviceConnectionPolicies/%s", projectID, region, policyName)
-	// Check if policy details are as expected
-	if policyDetails.Get("name").String() != expectedPolicyName {
-		t.Errorf("Service Connection Policy name mismatch: got %s, want %s", policyDetails.Get("name").String(), expectedPolicyName)
+	// Validate if valid JSON received
+	if !gjson.Valid(scpOutput) {
+		t.Errorf("Error parsing output, invalid json: %s", scpOutput)
 	}
+	// Parse gcloud output using gjson
+	policyDetails := gjson.Parse(scpOutput)
 
-	if policyDetails.Get("network").String() != fmt.Sprintf("projects/%s/global/networks/%s", projectID, networkName) {
-		t.Errorf("Service Connection Policy network mismatch: got %s, want %s", policyDetails.Get("network").String(), fmt.Sprintf("projects/%s/global/networks/%s", projectID, networkName))
+	expectedPolicyName := fmt.Sprintf("projects/%s/locations/%s/serviceConnectionPolicies/%s", projectID, region, policyName)
+	gotPolicyName := gjson.Get(policyDetails.String(), "name").String()
+	// Check if policy details are as expected
+	if gotPolicyName != expectedPolicyName {
+		t.Errorf("Service Connection Policy name mismatch: got %s, want %s", gotPolicyName, expectedPolicyName)
+	} else {
+		t.Logf("=============== Service Connection Policy '%s' verified successfully.================", gotPolicyName)
+	}
+	gotNetworkName := gjson.Get(policyDetails.String(), "network").String()
+	expectedNetworkName := fmt.Sprintf("projects/%s/global/networks/%s", projectID, networkName)
+	if gotNetworkName != expectedNetworkName {
+		t.Errorf("Service Connection Policy network mismatch: got %s, want %s", gotNetworkName, expectedNetworkName)
+	} else {
+		t.Logf("=============== Service Connection Policy Network '%s' verified successfully.================", gotNetworkName)
 	}
 
 	//Get self link of the existing subnet you created manually
@@ -292,8 +304,6 @@ func TestExistingVPCNetworkModule(t *testing.T) {
 	} else {
 		t.Log("No subnets specified in Service Connection Policy, which is acceptable in this test scenario.")
 	}
-
-	t.Logf("Service Connection Policy '%s' verified successfully using gcloud.", policyName)
 
 	t.Log(" ========= Verify PSA Range ========= ")
 	vpcOutputValue := terraform.OutputJson(t, terraformOptions, "vpc_networks")
@@ -365,21 +375,9 @@ func createVPCSubnets(t *testing.T, projectID string, networkName string, subnet
 }
 
 // Function to create Service Connection Policy
-func createServiceConnectionPolicy(t *testing.T, projectID, region, networkName, policyName, subnetworkID, serviceClass string, connectionLimit int) {
+func createServiceConnectionPolicy(t *testing.T, projectID string, region string, networkName string, policyName string, subnetworkName string, serviceClass string, connectionLimit int) {
 	// Get subnet self link from subnet ID using gcloud command
-	out, err := shell.RunCommandAndGetOutputE(t, shell.Command{
-		Command: "gcloud",
-		Args: []string{
-			"compute", "networks", "subnets", "describe", subnetworkID,
-			"--region", region,
-			"--project", projectID,
-			"--format=json",
-		},
-	})
-	if err != nil {
-		t.Errorf("Error getting subnet details: %s", err)
-	}
-	subnetSelfLink := gjson.Get(out, "selfLink").String()
+	subnetSelfLink := fmt.Sprintf("https://www.googleapis.com/compute/v1/projects/%s/regions/%s/subnetworks/%s", projectID, region, subnetworkName)
 
 	cmd := shell.Command{
 		Command: "gcloud",
@@ -395,7 +393,7 @@ func createServiceConnectionPolicy(t *testing.T, projectID, region, networkName,
 			"--quiet",
 		},
 	}
-	_, err = shell.RunCommandAndGetOutputE(t, cmd)
+	_, err := shell.RunCommandAndGetOutputE(t, cmd)
 	if err != nil {
 		t.Errorf("Error creating Service Connection Policy: %s", err)
 	}
