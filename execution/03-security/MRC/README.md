@@ -10,7 +10,7 @@ To ensure seamless communication between your Memorystore for Redis Cluster and 
 
 ## Example firewall rules
 
-Using the mrc-firewall.tf module, you can setup firewall rules to achieve inbound & outbound connections given as examples below based on your networking requirements.
+Using the firewall.tf module, you can setup firewall rules to achieve inbound & outbound connections given as examples below based on your networking requirements.
 
 - INGRESS/INBOUND : (Client to Redis Cluster)
 
@@ -19,7 +19,7 @@ Using the mrc-firewall.tf module, you can setup firewall rules to achieve inboun
 
 - EGRESS/OUTBOUND : (Redis Cluster to Client)
 
-    - Allow connections to MRC instance on port 6379 
+    - Allow connections to MRC instance on port 6379
     - Allow connections to port 443 to all IP addresses (for consumers such as GCE)
 
 <!-- BEGIN_TF_DOCS -->

@@ -62,7 +62,7 @@ Carefully review the plan to ensure it aligns with your intended configuration.
     terraform apply
     ```
 
-Terraform will read the YAML files from the `05-producer/CloudSQL/config` folder and create the corresponding Cloud SQL instances in your Google Cloud project.
+Terraform will read the YAML files from the `04-producer/CloudSQL/config` folder and create the corresponding Cloud SQL instances in your Google Cloud project.
 
 5. **Monitor and Manage:**
     * After the instances are created, you can monitor their status, performance, and logs through the Google Cloud Console or using the Google Cloud CLI.

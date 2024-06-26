@@ -84,6 +84,7 @@ The deployment is divided into seven logically isolated stages, each handled by 
    - This stage establishes Private Service Connect (PSC) for secure, private communication between your consumer project and the producer services created in the "04-producer" stage.
    - **Internal IP Addresses:** Reserved within specific subnets in your consumer project. These addresses act as private endpoints for the PSC connection, providing a secure and stable way to access your producer services.
    - **Forwarding Rules:** Created to direct traffic destined for the reserved internal IP addresses to your producer services through the PSC connection. This ensures seamless communication without exposing your services to the public internet.
+   - **Note :** This stage currently supports establishing PSC for Cloud SQL instances only.
 
 7. **06-consumer:**
    - Deploys GCP-managed consumer services.

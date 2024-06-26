@@ -30,12 +30,8 @@ Ensure the following Google Cloud APIs are enabled in your project:
 The user or service account executing Terraform must have the following roles (or equivalent permissions):
 
 - Compute Admin (for managing VMs)
-- Service Account User (if creating service accounts)
+- Service Account User (if using service accounts)
 - Tag Admin (if using tag bindings)
-
-### Terraform Installation:
-
-Have Terraform installed on your local machine. To install Terraform, follow the [official instructions](https://developer.hashicorp.com/terraform/tutorials/gcp-get-started).
 
 ## Execution Steps
 
@@ -70,7 +66,7 @@ Carefully review the plan to ensure it aligns with your intended configuration.
     terraform apply
     ```
 
-Terraform will read the YAML files from the `06-consumer/GCE/config` folder by default and create the corresponding GCE instances in your Google Cloud project.
+Terraform will read the YAML files from the `06-consumer/GCE/configs` folder by default and create the corresponding GCE instances in your Google Cloud project.
 
 5. **Monitor and Manage:**
 
@@ -82,50 +78,44 @@ Terraform will read the YAML files from the `06-consumer/GCE/config` folder by d
 
 - instance1.yaml : This is a sample YAML file that defines the configuration for a GCE instance. The file specifies the name, project ID, region, zone, image, and network of the instance.
 
-```
-name: instance1
-project_id: <project-id>
-region: us-central1
-zone: us-central1-a
-image: ubuntu-os-cloud/ubuntu-2204-lts
-network: projects/<project-id>/global/networks/<network-name>
-subnetwork: projects/<project-id>/regions/us-central1/subnetworks/<subnetwork-name>
-```
+  ```
+  name: instance1
+  project_id: <project-id>
+  region: us-central1
+  zone: us-central1-a
+  image: ubuntu-os-cloud/ubuntu-2204-lts
+  network: projects/<project-id>/global/networks/<network-name>
+  subnetwork: projects/<project-id>/regions/us-central1/subnetworks/<subnetwork-name>
+  ```
 
 - instance2.yaml : This is another sample YAML file that defines the configuration for a GCE instance. The file specifies the name, project ID, region, zone, image, network, and instance type of the instance.
 
-```
-name: instance1
-project_id: <project-id>
-region: us-central1
-zone: us-central1-a
-image: ubuntu-os-cloud/ubuntu-2204-lts
-network: projects/<project-id>/global/networks/<network-name>
-subnetwork: projects/<project-id>/regions/us-central1/subnetworks/<subnetwork-name>
-instance_type: e2-medium
-```
+  ```
+  name: instance1
+  project_id: <project-id>
+  region: us-central1
+  zone: us-central1-a
+  image: ubuntu-os-cloud/ubuntu-2204-lts
+  network: projects/<project-id>/global/networks/<network-name>
+  subnetwork: projects/<project-id>/regions/us-central1/subnetworks/<subnetwork-name>
+  instance_type: e2-medium
+  ```
 
 - instance3.yaml : This is another sample YAML file that defines the configuration for a GCE instance. The file specifies the name, project ID, region, zone, image, network, and instance type of the instance with a startup script.
 
-```
-name: instance3
-project_id: <project-id>
-region: us-central1
-zone: us-central1-a
-image: ubuntu-os-cloud/ubuntu-2204-lts
-network: projects/<project-id>/global/networks/<network-name>
-subnetwork: projects/<project-id>/regions/us-central1/subnetworks/<subnetwork-name>
-metadata:
-  "startup_script": |
-      #!/bin/bash
-      sudo apt update
-      sudo apt install -y apache2
-      echo '<!doctype html><html><body><h1>Hello World!</h1></body></html>' | tee /var/www/html/index.html
-      sudo a2ensite default-ssl
-      sudo a2enmod ssl
-      sudo service apache2 restart
-      echo '<!doctype html><html><body><h1>Hello World!</h1></body></html>' | tee /var/www/html/index.html
-```
+  ```
+  name: instance3
+  project_id: <project-id>
+  region: us-central1
+  zone: us-central1-a
+  image: ubuntu-os-cloud/ubuntu-2204-lts
+  network: projects/<project-id>/global/networks/<network-name>
+  subnetwork: projects/<project-id>/regions/us-central1/subnetworks/<subnetwork-name>
+  metadata:
+    "startup_script": |
+        #!/bin/bash
+        echo Hello World
+  ```
 
 ## Important Notes
 
@@ -133,8 +123,8 @@ metadata:
 - Carefully review and customize the YAML configuration files to match your specific requirements (e.g., project ID, region, zone, image, instance type, etc.).
 - Be sure to provide the correct service account credentials (if applicable) to allow Terraform to interact with your Google Cloud project.
 - Refer to the variables.tf file for a complete list of available variables and their descriptions.
-- The Terraform module used in this solution (cloud-foundation-fabric//modules/compute-vm) might have additional configuration options and capabilities. Refer to its [documentation](https://github.com/GoogleCloudPlatform/cloud-foundation-fabric/tree/master/modules/compute-vm) for further customization.
-- Remember to replace placeholders (<project-id>, <network-name>, <subnetwork-name>) with your actual values in the YAML files and Terraform configuration.
+- The Terraform module used in this solution (cloud-foundation-fabric/modules/compute-vm) might have additional configuration options and capabilities. Refer to its [documentation](https://github.com/GoogleCloudPlatform/cloud-foundation-fabric/tree/master/modules/compute-vm) for further customization.
+- Remember to replace placeholders ( \<project-id>, \<network-name>, \<subnetwork-name>) with your actual values in the YAML files and Terraform configuration.
 
 
 
@@ -144,9 +134,6 @@ metadata:
 |------|--------|---------|
 | <a name="module_vm"></a> [vm](#module\_vm) | github.com/GoogleCloudPlatform/cloud-foundation-fabric//modules/compute-vm | n/a |
 
-## Resources
-
-No resources.
 
 ## Inputs
 
