@@ -6,9 +6,9 @@ Secure your Cloud SQL databases with Google Cloud Firewall. This guide provides 
 
 1. **Create your configuration .tfvars files:**
 
-    * Create `.tfvars` file defining the values for ingress rules and egress rules. Ensure these files are stored in the `configuration/security/cloudsql-firewall.tfvars` folder.
+    * Create `cloudsql.tfvars` file defining the values for ingress rules and egress rules. Ensure these files are stored in the `configuration/security/cloudsql` folder.
 
-    * For reference on how to structure your `.tfvars` file , see the [example](#example) section below or refer to sample `terraform.tfvars.sample` file . Each field and its structure is described in the [input section](#inputs) below.
+    * For reference on how to structure your `cloudsql.tfvars` file , see the [example](#example) section below or refer to sample `terraform.tfvars.example` file . Each field and its structure is described in the [input section](#inputs) below.
 
 
 2. **Initialize Terraform:**
@@ -33,7 +33,7 @@ Carefully review the plan to ensure it aligns with your intended configuration.
     Once you're satisfied with the plan, execute the terraform apply command to provision your Cloud SQL instances:
 
     ```
-    terraform apply -var-file="../../../configuration/security/cloudsql-firewall.tfvars"
+    terraform apply -var-file="../../../configuration/security/cloudsql.tfvars"
     ```
 
 ### Example
@@ -42,7 +42,7 @@ Carefully review the plan to ensure it aligns with your intended configuration.
 project_id = "<your-project-id>"
 network    = "projects/<your-project-id>/global/networks/<your-vpc-name>"
 egress_rules = {
-  allow-egress = {
+  allow-egress-cloudsql = {
     deny = false
     rules = [{
       protocol = "tcp"

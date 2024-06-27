@@ -1,20 +1,64 @@
+## Introduction
 
+Secure your Alloy DB databases with Google Cloud Firewall. This guide provides step-by-step instructions on configuring firewall rules to control access and protect your valuable data.
+
+### Execution Steps
+
+1. **Create your configuration alloydb.tfvars files:**
+
+    * Create `alloydb.tfvars` file defining values for ingress rules and egress rules. Ensure the files are stored in the `configuration/security/alloydb` folder.
+
+    * For reference on how to structure your `alloydb.tfvars` file , see the [example](#example) section below or refer to sample `terraform.tfvars.example` file. Each field and its structure is described in the [input section](#inputs) below.
+
+
+2. **Initialize Terraform:**
+
+    * Run the following command to initialize Terraform:
+
+    ```
+    terraform init
+    ```
+3. **Review the Execution Plan:**
+
+    * Use the terraform plan command to generate an execution plan. This will show you the changes Terraform will make to your Google Cloud infrastructure:
+
+    ```
+    terraform plan
+    ```
+
+Carefully review the plan to ensure it aligns with your intended configuration.
+
+4. **Apply the Configuration:**
+
+    Once you're satisfied with the plan, execute the terraform apply command to provision Alloy DB instances:
+
+    ```
+    terraform apply -var-file="../../../configuration/security/alloydb.tfvars"
+    ```
+
+### Example
+```
+project_id = "<your-project-id>"
+network    = "projects/<your-project-id>/global/networks/<your-vpc-name>"
+egress_rules = {
+  allow-egress-alloydb = {
+    deny = false
+    rules = [{
+      protocol = "tcp"
+      ports    = ["5432"]
+    }]
+  }
+}
+```
 
 <!-- BEGIN_TF_DOCS -->
 
-## Providers
-
-No providers.
 
 ## Modules
 
 | Name | Source | Version |
 |------|--------|---------|
 | <a name="module_alloydb_firewall"></a> [alloydb\_firewall](#module\_alloydb\_firewall) | github.com/GoogleCloudPlatform/cloud-foundation-fabric//modules/net-vpc-firewall | v30.0.0 |
-
-## Resources
-
-No resources.
 
 ## Inputs
 

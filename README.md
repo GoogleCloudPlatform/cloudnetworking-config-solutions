@@ -43,7 +43,7 @@ The project is structured into the following folders:
 
   *  `00-bootstrap`: Sets up foundational resources like service accounts and Terraform state storage.
   * `01-organization`:  Manages organization-level policies for network resources.
-  * `02-networking`: Creates VPCs, subnets, Cloud HA VPN and other core networking components.
+  * `02-networking`: Manages VPCs, subnets, Cloud HA VPN and other core networking components like PSA, SCP, Cloud NAT.
   * `03-security`:  Configures firewalls and other security measures.
   * `04-producer`: Implements producer services like AlloyDB, Memorystore for Redis clusters, and Cloud SQL.
   * `05-networking-manual`: Implements networking services like Private Service Connectivity.

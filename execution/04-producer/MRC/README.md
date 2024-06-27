@@ -10,7 +10,7 @@ Before creating your first MRC instance, ensure you have completed the following
 
 1. **Completed Prior Stages:** Successful deployment of MRC resources depends on the completion of the following stages:
     * **01-organization:** This stage handles the activation of required Google Cloud APIs for MRC.
-    * **02-networking:** This stage sets up the necessary network infrastructure, such as VPCs and subnets, to support MRC connectivity. For MRC, ensure that you create a service connection policy. For the same, in networking tfvars configure this section carefully : 
+    * **02-networking:** This stage sets up the necessary network infrastructure, such as VPCs and subnets, to support MRC connectivity. For MRC, ensure that you create a service connection policy. For the same, in networking tfvars configure this section carefully :
 
     ```
     create_scp_policy      = true
@@ -97,9 +97,6 @@ network_id: projects/test-project/global/networks/network-name
 |------|---------|
 | <a name="provider_google"></a> [google](#provider\_google) | 5.32.0 |
 
-## Modules
-
-No modules.
 
 ## Resources
 

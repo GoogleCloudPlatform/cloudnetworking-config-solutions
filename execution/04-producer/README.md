@@ -18,13 +18,13 @@ The stage utilizes Terraform modules to streamline the provisioning process and 
     - **02-networking:** This stage handles the creation of networking resources such as VPCs, HA-VPNs etc.
     - **03-security:** This stage handles the creation of key security components such firewall rules. For GCE, the folder to use is 03-security/GCE.
 
-- **Enable APIs** : Based on the producer that you plan to provision, ensure the following APIs should be enabled : 
+- **Enable APIs** : Based on the producer that you plan to provision, ensure the following APIs should be enabled :
 
     - Cloud SQL Admin API: This is the primary API for managing Cloud SQL instances, including creation, configuration, backups, and more.
     - AlloyDB API: This is the core API for managing AlloyDB clusters and instances.
     - Cloud Memorystore for Redis API: This is the API for creating, configuring and managing Redis instances in Google Cloud
 
-- **Required Permissions** : Based on the producer that you plan to provision, ensure the following permissions are granted to the user runing the terraform modules : 
+- **Required Permissions** : Based on the producer that you plan to provision, ensure the following permissions are granted to the user runing the terraform modules :
 
     - [Cloud SQL Admin](https://cloud.google.com/sql/docs/mysql/iam-roles#:~:text=roles/cloudsql.admin) (roles/cloudsql.admin): This role provides full control over Cloud SQL instances, including creation, configuration, deletion, and management of databases, users, and backups.
     - [AlloyDB Admin](https://cloud.google.com/alloydb/docs/reference/iam-roles-permissions#:~:text=Description%0AAlloyDB%20permissions-,roles/alloydb.admin,-Cloud%20AlloyDB%20Admin) (roles/alloydb.admin): Grants full control over AlloyDB clusters, including creation, configuration, scaling, and management of instances.
@@ -34,11 +34,11 @@ The stage utilizes Terraform modules to streamline the provisioning process and 
 
 ### General Configuration Notes
 
-- YAML Configuration Files: Place YAML files defining each instance's configuration within the configs/ directory of the respective service's folder (e.g., cloudsql/configs/).
+- YAML Configuration Files: Place YAML files defining each instance's configuration within the config/ directory of the respective service's folder (e.g., cloudsql/config/).
 
 - Terraform Variables: You can customize the input variables in the .tf files according to your project's requirements.
 
-**NOTE** : for producer specific configuration details, please find them in the producer's README document : 
+**NOTE** : for producer specific configuration details, please find them in the producer's README document :
 
     - [CloudSQL](cloudnetworking-config-solution/execution/04-producer/CloudSQL/README.md)
     - [AlloyDB](cloudnetworking-config-solution/execution/04-producer/AlloyDB/README.md)

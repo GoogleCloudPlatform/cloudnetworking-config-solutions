@@ -2,13 +2,13 @@
 
 ## Overview
 
-This Terraform stage focuses on establishing essential security configurations for various Google Cloud Platform (GCP) resources. It includes configurations for AlloyDB, Memorystore Redis Cloud (MRC), CloudSQL, and GCE (Google Compute Engine). The core component of this stage is setting up firewall rules to control inbound and outbound traffic to these resources.
+This Terraform stage focuses on establishing essential security configurations for various Google Cloud Platform (GCP) resources, including AlloyDB, Memorystore for Redis Clusters (MRC), CloudSQL, and GCE (Google Compute Engine). The core component of this stage is setting up firewall rules to control inbound and outbound traffic to these resources.
 
 ## Prerequisites
 
 ### Enabled APIs:
 
-Based on the producer (such as CloudSQL, MRC or AlloyDB) or consumer service (such as GCE) that you use, you can enable their APIs in order to manage the setup : 
+Based on the producer (such as CloudSQL, MRC or AlloyDB) or consumer service (such as GCE) that you use, you can enable their APIs in order to manage the setup :
 
 - Compute Engine API
 - Cloud IAM API
@@ -25,8 +25,8 @@ The user or service account running Terraform should have sufficient IAM permiss
 ### Previous stage completion
 
 **Completed Prior Stages:** Successful deployment of security resources depends on the completion of the following stages:
-    * **01-organization:** This stage handles the activation of required Google Cloud APIs.
-    * **02-networking:** This stage handles the creation of required networking resources.
+  * **01-organization:** This stage handles the activation of required Google Cloud APIs.
+  * **02-networking:** This stage handles the creation of required networking resources.
 
 ## Components
 
@@ -45,7 +45,7 @@ Each component's configuration is handled within its respective .tfvars file. Th
 - egress_rules: Specific outbound firewall rules (refer to variables.tf for details).
 - ingress_rules: Specific inbound firewall rules (for gce-firewall.tf).
 
-Ensure that you modify these values within each file to match your environment's specific configuration requirements. You can find the confirguration files for the following security components under the `Configuration/security-tfvars` folder.
+Ensure that you modify these values within each file to match your environment's specific configuration requirements. You can find the confirguration files for the following security components under the `configuration/security` folder.
 
 - GCE : gce.tfvars
 - MRC : mrc.tfvars
@@ -54,15 +54,15 @@ Ensure that you modify these values within each file to match your environment's
 
 ## Usage
 
-1. **Adjust Variables** 
+1. **Adjust Variables**
 
 Open and modify the tfvars files to set values for project_id, network, default_rules_config, egress_rules, and ingress_rules as needed.
 
 2. **Terraform Steps**:
 
 - Initialize: Run `terraform init`.
-- Plan: Run `terraform plan -var-file=../configuration/security/your-component.tfvars` to review the planned changes.
-- Apply:  If the plan looks good, run `terraform apply -var-file=../configuration/security/your-component.tfvars` to create or update the resources.
+- Plan: Run `terraform plan -var-file=../../../configuration/security/your-component.tfvars` to review the planned changes.
+- Apply:  If the plan looks good, run `terraform apply -var-file=../../../configuration/security/your-component.tfvars` to create or update the resources.
 
 ## Important Notes
 
