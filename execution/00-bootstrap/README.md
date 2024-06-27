@@ -1,6 +1,6 @@
 ## Introduction
 
-The bootstrap stage is the first and most crucial step in setting up your Google Cloud infrastructure using Terraform. It lays the groundwork for subsequent stages (01-organization, 02-networking, 03-security, 05-producer, 06-networking-manual, 07-consumer) by provisioning essential resources and establishing security best practices. This stage focuses on creating the following:
+The bootstrap stage is the first and most crucial step in setting up your Google Cloud infrastructure using Terraform. It lays the groundwork for subsequent stages (01-organization, 02-networking, 03-security, 04-producer, 05-networking-manual, 06-consumer) by provisioning essential resources and establishing security best practices. This stage focuses on creating the following:
   * **Impersonating Service Accounts:** This stage generates service accounts for each subsequent stage, allowing them to impersonate roles with the necessary permissions for their respective tasks. This approach enhances security by granting only the required privileges to each stage.
   * **Terraform State Bucket:** A Google Cloud Storage bucket is created to store the Terraform state files. This centralizes state management, making it easier to track changes and collaborate on infrastructure updates.
 
@@ -46,13 +46,6 @@ This minimal example includes only the essential fields required to execute the 
   * **Security**: Pay close attention to the permissions granted to the service accounts. Follow the principle of least privilege to minimize security risks.
   * **State Management:** The Terraform state bucket is critical for maintaining the state of your infrastructure. Ensure its security and accessibility.
   * **Dependencies:** This bootstrap stage is a prerequisite for all subsequent stages. Make sure it is executed successfully before proceeding with other stages.
-  * **Note on Skipped Stage 04:**
-    A stage numbered "04" has been intentionally omitted from this core bootstrap process. This placeholder stage is intended to be replaced or customized based on your specific infrastructure requirements.
-    For example, you might use this stage for:
-    * Project Factory (04-projectfactory): Automating the creation of Google Cloud projects.
-    * Custom Resource Deployment (04-custom-resources): Provisioning specific resources or services not covered in other stages.
-    Other Customized Configurations: Any other stage specific to your organization's needs.
-    * Feel free to adapt or extend the Terraform configuration to implement your desired stage in the "04" slot.
   **Note:** You can skip the bootstrap stage if you choose, but you must ensure the following:
   * **Permissions:** The user or service account executing Terraform for each individual stage (01-organization, 02-networking, etc.) must have the necessary IAM permissions outlined in the respective stage's README file.
  * **State File Management:** You are responsible for setting up and maintaining a secure location for Terraform state files for each stage. This could involve using a Google Cloud Storage bucket, a local backend, or another suitable storage mechanism.

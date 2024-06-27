@@ -1,28 +1,28 @@
 # Manual Networking Setup for PSC
 
-**NOTE** : Please skip this step if you are not provisioning a producer service using [Private Service Connect](https://cloud.google.com/vpc/docs/private-service-connect). 
+**NOTE** : Please skip this step if you are not provisioning a producer service using [Private Service Connect](https://cloud.google.com/vpc/docs/private-service-connect).
 
 ## Overview
 
-This stage establishes a Private Service Connect (PSC) connection between your consumer and the producer service you created in the previous "05-producer" step. This is done by creating a forwarding rule that directs traffic from a reserved IP address to the PSC attachment on your producer service (e.g., Cloud SQL database). PSC enables secure and private communication within Google Cloud Platform (GCP), shielding your services from the public internet. This stage configures a Private Service Connect (PSC) connection between your consumer project and the producer services you've set up. It does this by creating:
+This stage establishes a Private Service Connect (PSC) connection between your consumer and the producer service you created in the previous "04-producer" step. This is done by creating a forwarding rule that directs traffic from a reserved IP address to the PSC attachment on your producer service (e.g. Cloud SQL database). PSC enables secure and private communication within Google Cloud Platform (GCP), shielding your services from the public internet. This stage configures a Private Service Connect (PSC) connection between your consumer project and the producer services you've set up. It does this by creating:
 
 1. **Internal IP Addresses:** Reserved within specific subnetworks in your consumer project, acting as private endpoints for the PSC connection.
 2. **Forwarding Rules:** Directing traffic destined for these internal IPs to your producer services through the PSC connection.
 
 ## How It Works
 
-This configuration is designed for flexibility. You can define multiple producer services within your `configuration/psc-manual.tfvars` file.
+This configuration is designed for flexibility. You can define multiple producer services within your `configuration/networking-manual.tfvars` file.
 
 **Key Points:**
 
-* **`google_compute_address`:**  This resource will create a new internal IP address if `ip_address` is specified for a `psc_endpoint` in your `psc-manual.tfvars` file. If no address is provided, it will automatically reserve an address.
-* **`google_compute_forwarding_rule`:**  This resource sets up the forwarding rule, connecting the internal IP (or the automatically created one) to the `psc_service_attachment_link` of your producer service. 
+* **`google_compute_address`:**  This resource will create a new internal IP address if `ip_address` is specified for a `psc_endpoint` in your `networking-manual.tfvars` file. If no address is provided, it will automatically reserve an address.
+* **`google_compute_forwarding_rule`:**  This resource sets up the forwarding rule, connecting the internal IP (or the automatically created one) to the `psc_service_attachment_link` of your producer service.
 
 ## Configuration
 
-This stage uses a modularized approach. The main.tf file in the root directory orchestrates the creation of multiple forwarding rules based on the configuration provided in the psc-manual.tfvars file.
+This stage uses a modularized approach. The psc-forwarding-rules.tf file in the root directory orchestrates the creation of multiple forwarding rules based on the configuration provided in the networking-manual.tfvars file.
 
-While running this stage, please carefully note the following details : 
+While running this stage, please carefully note the following details :
 
 - The variable `psc_endpoints`, is a list of objects, where each object represents a producer (such as Cloud SQL) instance:
 
@@ -35,23 +35,23 @@ While running this stage, please carefully note the following details :
     - `allow_psc_global_access`       = true/false                  # (Optional) Allow global access
     - `labels`                        = { key = "value" }           # (Optional) Labels for resources
 
-- * **Regions:** Ensure your producer service, subnetwork, and service attachment all reside within the same GCP region.
-- * **IP Addresses:** Verify the specified `ip_address` values are available and not already in use.
+- **Regions:** Ensure your producer service, subnetwork, and service attachment all reside within the same GCP region.
+- **IP Addresses:** Verify the specified `ip_address` values are available and not already in use.
 
-## Example configuration/psc-manual.tfvars
+## Example configuration/networking-manual.tfvars
 
 ```
 psc_endpoints = [
-{
-endpoint_project_id          = "project-for-endpoint"
-producer_instance_project_id = "project-producer"
-producer_instance_name       = "sql-3"
-subnetwork_name              = "subnetwork-3"
-network_name                 = "network-3"
-ip_address_literal           = ""
-allow_psc_global_access      = false
-labels                       = { environment = "dev" }
-},
+  {
+    endpoint_project_id          = "project-for-endpoint"
+    producer_instance_project_id = "project-producer"
+    producer_instance_name       = "sql-3"
+    subnetwork_name              = "subnetwork-3"
+    network_name                 = "network-3"
+    ip_address_literal           = ""
+    allow_psc_global_access      = false
+    labels                       = { environment = "dev" }
+  },
 ]
 ```
 
@@ -62,9 +62,6 @@ labels                       = { environment = "dev" }
 |------|--------|---------|
 | <a name="module_psc_forwarding_rules"></a> [psc\_forwarding\_rules](#module\_psc\_forwarding\_rules) | ../modules/psc_forwarding_rule | n/a |
 
-## Resources
-
-No resources.
 
 ## Inputs
 

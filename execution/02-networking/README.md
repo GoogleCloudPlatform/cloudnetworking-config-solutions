@@ -11,7 +11,7 @@ Key features of this configuration include:
 - **Cloud NAT**: Enable private Google Compute Engine (GCE) instances within your VPC to access the internet while maintaining the security of private IP addresses.
 
 
-### Benefits 
+### Benefits
 
 - High Availability: This configuration promotes high availability through redundant VPN tunnels and strategically placed subnets.
 - Modularity: The modular structure of this configuration allows you to easily add or remove components as needed.
@@ -24,22 +24,22 @@ Key features of this configuration include:
 1. **Completed Prior Stages:** Successful deployment of networking resources depends on the completion of the following stages:
     * **01-organization:** This stage handles the activation of required Google Cloud APIs.
 
-2. Enable the following APIs : 
+2. Enable the following APIs :
 
-- [Compute Engine API](https://cloud.google.com/compute/docs/reference/rest/v1): Used for creating and managing VPC networks, subnets, forwarding rules, HA VPN tunnels/gateways, Cloud NAT and firewall rules.
-- [Service Networking API](https://cloud.google.com/service-infrastructure/docs/service-networking/getting-started): to manage Private Service Access (PSA) configurations.
-- [Network Connectivity API](https://cloud.google.com/network-connectivity/docs/reference/networkconnectivity/rest)
-    - Enables connectivity with and between Google Cloud resources.
-- [Service Consumer Management API](https://cloud.google.com/service-infrastructure/docs/service-consumer-management/reference/rest) : enabled in the project that Private Service Connect endpoints are deployed in. This API lets Google Cloud create the Network Connectivity Service Account that deploys Private Service Connect endpoints.
+    - [Compute Engine API](https://cloud.google.com/compute/docs/reference/rest/v1): Used for creating and managing VPC networks, subnets, forwarding rules, HA VPN tunnels/gateways, Cloud NAT and firewall rules.
+    - [Service Networking API](https://cloud.google.com/service-infrastructure/docs/service-networking/getting-started): to manage Private Service Access (PSA) configurations.
+    - [Network Connectivity API](https://cloud.google.com/network-connectivity/docs/reference/networkconnectivity/rest)
+        - Enables connectivity with and between Google Cloud resources.
+    - [Service Consumer Management API](https://cloud.google.com/service-infrastructure/docs/service-consumer-management/reference/rest) : enabled in the project that Private Service Connect endpoints are deployed in. This API lets Google Cloud create the Network Connectivity Service Account that deploys Private Service Connect endpoints.
 
-3. Permissions required for this stage : 
+3. Permissions required for this stage :
 
     - [Compute Network Admin](https://cloud.google.com/iam/docs/understanding-roles#compute.networkAdmin) : roles/compute.networkAdmin : Grants full control over VPC networks, subnets, firewall rules, and related resources.
     - [Compute Shared VPN Admin](https://cloud.google.com/compute/docs/access/iam#compute.xpnAdmin) : roles/compute.xpnAdmin : Permissions to administer shared VPC host projects, specifically enabling the host projects and associating shared VPC service projects to the host project's network.
 
 ## Components
 
-- `ha-vpn.tf`: 
+- `ha-vpn.tf`:
     - Defines the HA VPN gateway, creating two redundant tunnels for high availability.
     - Configures BGP sessions for dynamic routing between your on-premises network and GCP.
     - Manages custom route advertisement to control traffic flow.
@@ -64,7 +64,7 @@ Key features of this configuration include:
 
 ## Configuration
 
-To configure networking.tfvars for your environment, here's an example which can be used for your reference : 
+To configure networking.tfvars for your environment, here's an example which can be used for your reference :
 
 ```
 project_id = "gcp-project-id"
@@ -89,7 +89,7 @@ subnets = [
 # PSC/Service Connecitvity Variables
 
 create_scp_policy      = true
-subnets_for_scp_policy = ["subnet1"] 
+subnets_for_scp_policy = ["subnet1"]
 
 ## Cloud Nat input variables
 create_nat = true
@@ -116,7 +116,7 @@ tunnel_2_shared_secret            = "secret2"
 
 ## Usage
 
-**NOTE** : run the terraform commands with the `-var-file` referencing the networking.tfvars present under the /configuration folder. Example : 
+**NOTE** : run the terraform commands with the `-var-file` referencing the networking.tfvars present under the /configuration folder. Example :
 
 ```
 terraform plan -var-file=../configuration/networking.tfvars

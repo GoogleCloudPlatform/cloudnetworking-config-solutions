@@ -7,32 +7,32 @@ This directory serves as a centralized repository for all Terraform configuratio
 - 00-bootstrap stage (Filename : bootstrap.tfvars)
 - 01-organisation stage (Filename : organisation.tfvars)
 - 02-networking stage (Filename : networking.tfvars)
-- 03-security stage 
-        - AlloyDB (alloydb-firewall.tfvars)
-        - MRC (mrc-firewall.tfvars)
-        - Cloud SQL (sql-firewall.tfvars)
-        - GCE (gce-firewall.tfvars)
+- 03-security stage
+    - AlloyDB (Filename : alloydb.tfvars)
+    - MRC (Filename : mrc.tfvars)
+    - Cloud SQL (Filename : sql.tfvars)
+    - GCE (Filename : gce.tfvars)
 - 05-networking-manual stage (Filename : networking-manual.tfvars)
 
 # Usage
 
 ## Specifying Variable Files
 
-When executing a Terraform stage (e.g., plan, apply, destroy), you must explicitly instruct Terraform to use the corresponding configuration file. This is achieved using the `-var-file` flag followed by the relative path to the .tfvars file.
+When executing a Terraform stage (e.g. terraform plan, terraform apply, terraform destroy), you must explicitly instruct Terraform to use the corresponding configuration file. This is achieved using the `-var-file` flag followed by the relative path to the .tfvars file.
 
 ## Relative Paths
 
 Relative paths are essential for maintaining flexibility and ensuring your Terraform configuration works across different environments. While running any of the stages, use the [-var-file flag](https://developer.hashicorp.com/terraform/language/values/variables#variable-definitions-tfvars-files) to give relative path of the .tfvars file. Let's assume you're within the networking directory and want to execute terraform plan using the networking.tfvars configuration file:
 
 ```none
-terraform plan -var-file=../config-files/networking.tfvars
+terraform plan -var-file=../configuration/networking.tfvars
 ```
 
-This would run the terraform plan based on the vars provided in the networking.tfvars file in the `config-files` folder. In this example:
+This would run the terraform plan based on the values for the variables declared in the networking.tfvars file in the `configuration` folder. In this example:
 
-- `-var-file` instructs Terraform to load variables from the specified file.
-- `../` moves up one directory level from networking.
-- `config-files/networking.tfvars points` to the exact location of the configuration file.
+- `-var-file` : instructs Terraform to load variables from the specified file.
+- `../` : moves up one directory level from networking.
+- `configuration/networking.tfvars` : points to the configuration folder containing the networking.tfvars file.
 
 ## Benefits of Centralized Configuration
 
@@ -66,7 +66,7 @@ networking_manual_stage_administrator = ["example@example.com"]
 consumer_stage_administrator          = ["example@example.com"]
 ```
 
-## 01-organization 
+## 01-organization
 
 **Example usage**
 
@@ -107,7 +107,7 @@ subnets = [
 
 
 create_scp_policy      = true
-subnets_for_scp_policy = ["subnet-test"] 
+subnets_for_scp_policy = ["subnet-test"]
 
 create_nat = true
 
@@ -131,11 +131,11 @@ tunnel_2_shared_secret            = ""
 
 ## 03-security
 
-  - `project_id` : this variable identifies the GCP project where the firewall rule will be created. 
+  - `project_id` : this variable identifies the GCP project where the firewall rule will be created.
   - `network` : this variable specifies the name of the Virtual Private Cloud (VPC) network to which the firewall rule will be applied. Firewall rules control traffic flow in and out of your VPC network.
   - `egress_rules/ingress_rules` : this variable defines a set of egress (outbound) firewall rules. These rules determine what kind of outgoing traffic is permitted from your VPC network to destinations outside the network.
 
-***Example Usage** 
+***Example Usage**
 
 ```
 project_id              = "project-id"
@@ -151,7 +151,7 @@ egress_rules = {
 }
 ```
 
-## 06-network-manual (psc-manual.tfvars)
+## 05-networking-manual (networking-manual.tfvars)
 
 Defined using `psc_endpoints` which is a list of PSC endpoint configurations consisting of:
 
