@@ -13,7 +13,7 @@
 # limitations under the License.
 
 module "mrc_firewall" {
-  source               = "github.com/GoogleCloudPlatform/cloud-foundation-fabric//modules/net-vpc-firewall?ref=v31.0.0"
+  source               = "github.com/GoogleCloudPlatform/cloud-foundation-fabric//modules/net-vpc-firewall?ref=v31.1.0"
   project_id           = var.project_id
   network              = var.network
   default_rules_config = var.default_rules_config
