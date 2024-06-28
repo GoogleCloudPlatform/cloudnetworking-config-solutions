@@ -1,0 +1,43 @@
+version: 1
+updates:
+- package-ecosystem: gomod
+  directories:
+    - "/"
+    - "/tools"
+  schedule:
+    interval: daily
+  rebase-strategy: disabled
+  commit-message:
+      prefix: ":seedling:"
+  open-pull-requests-limit: 3
+- package-ecosystem: "github-actions"
+  directory: "/"
+  schedule:
+      interval: "weekly"
+  rebase-strategy: disabled
+  commit-message:
+      prefix: ":seedling:"
+  groups:
+    github-actions:
+      patterns:
+        - "*"
+      # These actions directly influence the build process and are excluded from grouped updates
+      exclude-patterns:
+        - "actions/setup-go"
+        - "arduino/setup-protoc"
+        - "goreleaser/goreleaser-action"
+- package-ecosystem: docker
+  directories:
+    - "/"
+    - "/cron/internal/bq"
+    - "/cron/internal/worker"
+    - "/cron/internal/webhook"
+    - "/cron/internal/controller"
+    - "/cron/internal/cii"
+    - "/clients/githubrepo/roundtripper/tokens/server"
+    - "/attestor"
+  schedule:
+    interval: weekly
+  rebase-strategy: disabled
+  commit-message:
+      prefix: ":seedling:"
