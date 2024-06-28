@@ -13,7 +13,7 @@
 # limitations under the License.
 
 module "cloudsql" {
-  source                        = "github.com/GoogleCloudPlatform/cloud-foundation-fabric//modules/cloudsql-instance?ref=v31.0.0"
+  source                        = "github.com/GoogleCloudPlatform/cloud-foundation-fabric//modules/cloudsql-instance?ref=v31.1.0"
   for_each                      = { for cloudsql in local.instance_list : cloudsql.name => cloudsql }
   project_id                    = each.value.project_id
   name                          = each.value.name
