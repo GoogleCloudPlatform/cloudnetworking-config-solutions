@@ -17,7 +17,7 @@
  Service Account used to run Organization Stage
 *********************************************/
 module "organization" {
-  source     = "github.com/GoogleCloudPlatform/cloud-foundation-fabric//modules/iam-service-account?ref=v31.1.0"
+  source     = "github.com/GoogleCloudPlatform/cloud-foundation-fabric//modules/iam-service-account?ref=v32.0.1"
   project_id = var.bootstrap_project_id
   name       = var.organization_sa_name
   iam = {
@@ -28,7 +28,7 @@ module "organization" {
  Service Account used to run Networking Stage
 *********************************************/
 module "networking" {
-  source     = "github.com/GoogleCloudPlatform/cloud-foundation-fabric//modules/iam-service-account?ref=v31.1.0"
+  source     = "github.com/GoogleCloudPlatform/cloud-foundation-fabric//modules/iam-service-account?ref=v32.0.1"
   project_id = var.bootstrap_project_id
   name       = var.networking_sa_name
   iam = {
@@ -44,7 +44,7 @@ module "networking" {
  Service Account used to run Security Stage
 *********************************************/
 module "security" {
-  source     = "github.com/GoogleCloudPlatform/cloud-foundation-fabric//modules/iam-service-account?ref=v31.1.0"
+  source     = "github.com/GoogleCloudPlatform/cloud-foundation-fabric//modules/iam-service-account?ref=v32.0.1"
   project_id = var.bootstrap_project_id
   name       = var.security_sa_name
   iam = {
@@ -65,7 +65,7 @@ module "security" {
  Service Account used to run Producer Stage
 *********************************************/
 module "producer" {
-  source     = "github.com/GoogleCloudPlatform/cloud-foundation-fabric//modules/iam-service-account?ref=v31.1.0"
+  source     = "github.com/GoogleCloudPlatform/cloud-foundation-fabric//modules/iam-service-account?ref=v32.0.1"
   project_id = var.bootstrap_project_id
   name       = var.producer_sa_name
   iam = {
@@ -88,7 +88,7 @@ module "producer" {
  Service Account used to run Networking Manual Stage
 *****************************************************/
 module "networking_manual" {
-  source     = "github.com/GoogleCloudPlatform/cloud-foundation-fabric//modules/iam-service-account?ref=v31.1.0"
+  source     = "github.com/GoogleCloudPlatform/cloud-foundation-fabric//modules/iam-service-account?ref=v32.0.1"
   project_id = var.bootstrap_project_id
   name       = var.networking_manual_sa_name
   iam = {
@@ -110,7 +110,7 @@ module "networking_manual" {
  Service Account used to run Consumer Stage
 *********************************************/
 module "consumer" {
-  source     = "github.com/GoogleCloudPlatform/cloud-foundation-fabric//modules/iam-service-account?ref=v31.1.0"
+  source     = "github.com/GoogleCloudPlatform/cloud-foundation-fabric//modules/iam-service-account?ref=v32.0.1"
   project_id = var.bootstrap_project_id
   name       = var.consumer_sa_name
   iam = {
