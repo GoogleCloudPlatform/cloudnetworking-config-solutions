@@ -14,7 +14,7 @@
 
 module "nat" {
   count          = var.create_nat ? 1 : 0
-  source         = "github.com/GoogleCloudPlatform/cloud-foundation-fabric//modules/net-cloudnat?ref=v30.0.0"
+  source         = "github.com/GoogleCloudPlatform/cloud-foundation-fabric//modules/net-cloudnat?ref=v33.0.0"
   project_id     = var.project_id
   region         = var.region
   name           = var.nat_name
