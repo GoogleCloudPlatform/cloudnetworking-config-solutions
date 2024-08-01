@@ -14,7 +14,7 @@
 
 module "havpn" {
   count         = var.create_havpn ? 1 : 0
-  source        = "github.com/GoogleCloudPlatform/cloud-foundation-fabric//modules/net-vpn-ha?ref=v30.0.0"
+  source        = "github.com/GoogleCloudPlatform/cloud-foundation-fabric//modules/net-vpn-ha?ref=v33.0.0"
   project_id    = var.project_id
   region        = var.region
   network       = local.network_id
