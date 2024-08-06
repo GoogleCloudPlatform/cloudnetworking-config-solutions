@@ -29,7 +29,7 @@ The stage is designed to be highly flexible. For GCE, it allows customizations s
 
 ### General Configuration Notes
 
-- YAML Configuration Files: Place YAML files defining each instance's configuration within the configs/ directory of the respective service's folder (e.g., 04-producer/CloudSQL/config/).
+- YAML Configuration Files: Place YAML files defining each instance's configuration within the configs/ directory of the respective service's folder (e.g., configuration/consumer/GCE/config).
 
 - Terraform Variables: You can customize the input variables in the .tf files according to your project's requirements.
 

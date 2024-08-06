@@ -94,5 +94,5 @@ variable "cluster_encryption_key_name" {
 variable "config_folder_path" {
   description = "Location of YAML files holding AlloyDB configuration values."
   type        = string
-  default     = "config"
+  default     = "../../../configuration/producer/AlloyDB/config"
 }

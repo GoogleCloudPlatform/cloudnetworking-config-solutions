@@ -36,7 +36,7 @@ With the prerequisites in place and your MRC configuration files ready, you can 
 
 1. Create your configuration files:
 
-Create YAML files defining the properties of each MRC instance you want to create. Ensure these files are stored in the config folder within this MRC folder.
+Create YAML files defining the properties of each MRC instance you want to create. Ensure these files are stored in the config folder under the configuration/producer/MRC/config folder.
 
 Each YAML file should map to a single MRC instance, providing details such as instance name, project ID, region, shard count, replica count, and network ID. Each field and its structure are described in the input section below.
 
@@ -57,7 +57,7 @@ terraform init
 Use the terraform plan command to generate an execution plan. This will show you the changes Terraform will make to your Google Cloud infrastructure:
 
 ```
-terraform plan
+terraform plan -var-file=../../../configuration/producer/MRC/mrc.tfvars
 ```
 
 4. Apply the Configuration:
@@ -65,7 +65,7 @@ terraform plan
 Once you're satisfied with the plan, execute the terraform apply command to provision your MRC instances:
 
 ```
-terraform apply
+terraform apply -var-file=../../../configuration/producer/MRC/mrc.tfvars
 ```
 
 5. Monitor and Manage:

@@ -33,5 +33,5 @@ variable "replica_count" {
 variable "config_folder_path" {
   description = "Location of YAML files holding MRC configuration values."
   type        = string
-  default     = "./config"
+  default     = "../../../configuration/producer/MRC/config"
 }

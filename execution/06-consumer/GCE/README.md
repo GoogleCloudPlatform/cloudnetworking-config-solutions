@@ -53,7 +53,7 @@ The user or service account executing Terraform must have the following roles (o
     - Use the following command to generate an execution plan. This will show you the changes Terraform will make to your Google Cloud infrastructure:
 
     ```
-    terraform plan
+    terraform plan -var-file=../../../configuration/consumer/GCE/gce.tfvars
     ```
 
 Carefully review the plan to ensure it aligns with your intended configuration.
@@ -63,10 +63,10 @@ Carefully review the plan to ensure it aligns with your intended configuration.
     Once you're satisfied with the plan, execute the terraform apply command to provision your GCE instances:
 
     ```
-    terraform apply
+    terraform apply -var-file=../../../configuration/consumer/GCE/gce.tfvars
     ```
 
-Terraform will read the YAML files from the `06-consumer/GCE/config` folder by default and create the corresponding GCE instances in your Google Cloud project.
+Terraform will read the YAML files from the `configuration/consumer/GCE/config` folder by default and create the corresponding GCE instances in your Google Cloud project.
 
 5. **Monitor and Manage:**
 
