@@ -4,15 +4,15 @@ This directory serves as a centralized repository for all Terraform configuratio
 
 ## File Organization by Stage
 
-- 00-bootstrap stage (Filename : bootstrap.tfvars)
-- 01-organisation stage (Filename : organisation.tfvars)
-- 02-networking stage (Filename : networking.tfvars)
+- 00-bootstrap stage (bootstrap.tfvars)
+- 01-organisation stage (organisation.tfvars)
+- 02-networking stage (networking.tfvars)
 - 03-security stage
-    - AlloyDB (Filename : alloydb.tfvars)
-    - MRC (Filename : mrc.tfvars)
-    - Cloud SQL (Filename : sql.tfvars)
-    - GCE (Filename : gce.tfvars)
-- 05-networking-manual stage (Filename : networking-manual.tfvars)
+    - AlloyDB (alloydb.tfvars)
+    - MRC (mrc.tfvars)
+    - Cloud SQL (sql.tfvars)
+    - GCE (gce.tfvars)
+- 05-networking-manual stage (networking-manual.tfvars)
 
 # Usage
 
@@ -86,7 +86,7 @@ consumer_stage_administrator          = ["example@example.com"]
   }
 ```
 
-### 02-networking
+## 02-networking
 
 **Example usage**
 
@@ -151,6 +151,10 @@ egress_rules = {
 }
 ```
 
+## 04-producer
+
+Producer specific configuration examples can be found under the `/config` folder of that specific producer. Such as for AlloyDB, the example would be in the folder `04-producer/AlloyDB/config`.
+
 ## 05-networking-manual (networking-manual.tfvars)
 
 Defined using `psc_endpoints` which is a list of PSC endpoint configurations consisting of:
@@ -182,6 +186,10 @@ psc_endpoints = [
   # Add more endpoint objects as needed
 ]
 ```
+
+## 06-consumer
+
+Consumer specific configuration examples can be found under the `/config` folder of that specific consumer. Such as for GCE, the example would be in the folder `06-consumer/GCE/config`.
 
 ## Considerations
 

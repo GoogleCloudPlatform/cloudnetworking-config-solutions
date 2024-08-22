@@ -1,6 +1,6 @@
 name: <instance-name>
 project_id: <project-id>
-region: us-central1
+region: <region> #e.g. : us-central1
 database_version: <database-version-id> #e.g. : POSTGRES_15
 network_config:
   connectivity:
