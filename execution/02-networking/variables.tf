@@ -296,3 +296,156 @@ variable "service_class" {
   default     = "gcp-memorystore-redis"
   description = "Allowed service class (static)"
 }
+
+
+##Interconnect
+
+variable "interconnect_project_id" {
+  description = "The ID of the project in which the resource(physical connection at colocation facilitity) belongs."
+  type        = string
+}
+
+variable "first_interconnect_name" {
+  description = "Name of the first interconnect object. This will be used to populate the URL of the underlying Interconnect object that this attachment's traffic will traverse through."
+  type        = string
+  default     = ""
+}
+
+variable "second_interconnect_name" {
+  description = "Name of the second interconnect object. This will be used to populate the URL of the underlying Interconnect object that this attachment's traffic will traverse through."
+  type        = string
+  default     = ""
+}
+
+variable "ic_router_name" {
+  description = "Name of the interconnect router."
+  type        = string
+  default     = "interconnect-router"
+}
+
+variable "ic_router_bgp_asn" {
+  description = "Local BGP Autonomous System Number (ASN). Must be an RFC6996 private ASN, either 16-bit or 32-bit. The value will be fixed for this router resource."
+  type        = string
+  default     = ""
+}
+
+variable "ic_router_advertise_mode" {
+  description = "User-specified flag to indicate which mode to use for advertisement. Default value is DEFAULT. Possible values are: DEFAULT, CUSTOM"
+  type        = string
+  default     = "CUSTOM"
+}
+
+variable "ic_router_advertise_groups" {
+  description = "User-specified list of prefix groups to advertise in custom mode. This field can only be populated if advertiseMode is CUSTOM and is advertised to all peers of the router."
+  type        = list(string)
+  default     = ["ALL_SUBNETS"]
+}
+
+variable "user_specified_ip_range" {
+  description = "User-specified list of individual IP ranges to advertise in custom mode. This range specifies google private api address."
+  type        = list(string)
+  default     = ["199.36.154.8/30"]
+}
+
+## First Vlan Attachment
+
+variable "create_interconnect" {
+  type        = string
+  description = "Set to true to create google cloud resources for setting up dedicated interconnect."
+  default     = "false"
+}
+
+variable "first_va_name" {
+  description = "The name of the first interconnect attachment"
+  type        = string
+  default     = "dedicated-ic-vlan-attachment-3"
+}
+
+variable "first_va_description" {
+  description = "The description of the first interconnect attachment"
+  type        = string
+  default     = "interconnect-a vlan attachment 0"
+}
+
+variable "first_va_asn" {
+  description = "(Required) Local BGP Autonomous System Number (ASN). Must be an RFC6996 private ASN, either 16-bit or 32-bit. The value will be fixed for this router resource."
+  type        = string
+  default     = ""
+}
+
+variable "first_va_bandwidth" {
+  description = "Provisioned bandwidth capacity for the first interconnect attachment."
+  type        = string
+  default     = "BPS_1G"
+}
+
+variable "first_va_bgp_range" {
+  description = "Up to 16 candidate prefixes that can be used to restrict the allocation of cloudRouterIpAddress and customerRouterIpAddress for this attachment. All prefixes must be within link-local address space (169.254.0.0/16) and must be /29 or shorter (/28, /27, etc)."
+  type        = string
+  default     = ""
+}
+
+variable "first_vlan_tag" {
+  description = "The IEEE 802.1Q VLAN tag for this attachment, in the range 2-4094."
+  type        = number
+  default     = null
+}
+
+variable "create_first_vc_router" {
+  description = "Select 'true' to create a separate router for this VLAN attachment, or 'false' to use the current router configuration."
+  type        = bool
+  default     = false
+}
+
+## Second Vlan Attachment
+
+variable "second_va_name" {
+  description = "The name of the Second interconnect attachment."
+  type        = string
+  default     = "dedicated-ic-vlan-attachment-4"
+}
+
+variable "second_va_description" {
+  description = "The description of the second interconnect attachment"
+  type        = string
+  default     = "interconnect-b vlan attachment 1"
+}
+
+variable "second_va_asn" {
+  description = "(Required) Local BGP Autonomous System Number (ASN). Must be an RFC6996 private ASN, either 16-bit or 32-bit. The value will be fixed for this router resource."
+  type        = string
+  default     = ""
+}
+
+variable "second_va_bandwidth" {
+  description = "Provisioned bandwidth capacity for the second interconnect attachment."
+  type        = string
+  default     = "BPS_1G"
+}
+
+variable "second_va_bgp_range" {
+  description = "Up to 16 candidate prefixes that can be used to restrict the allocation of cloudRouterIpAddress and customerRouterIpAddress for this attachment. All prefixes must be within link-local address space (169.254.0.0/16) and must be /29 or shorter (/28, /27, etc)."
+  type        = string
+  default     = ""
+}
+
+variable "second_vlan_tag" {
+  description = "The IEEE 802.1Q VLAN tag for this attachment, in the range 2-4094."
+  type        = number
+  default     = null
+}
+
+variable "create_second_vc_router" {
+  description = "Select 'true' to create a separate router for this VLAN attachment, or 'false' to use the current router configuration."
+  type        = bool
+  default     = false
+}
+
+variable "admin_enabled" {
+  description = "Whether the VLAN attachment is enabled."
+  type        = bool
+  default     = true
+}
+
+
+

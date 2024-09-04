@@ -16,11 +16,14 @@ package integrationtest
 
 import (
 	"fmt"
+	"log"
 	"math/rand"
 	"os"
+	"strconv"
 	"testing"
 	"time"
 
+	"github.com/google/go-cmp/cmp"
 	"github.com/gruntwork-io/terratest/modules/shell"
 	"github.com/gruntwork-io/terratest/modules/terraform"
 	"github.com/tidwall/gjson"
@@ -28,7 +31,7 @@ import (
 
 const (
 	terraformDirectoryPath   = "../../../02-networking"
-	region                   = "us-central1"
+	region                   = "us-west2"
 	peerASN                  = 64513
 	psaRangeName             = "testpsarange"
 	psaRange                 = "10.0.64.0/20"
@@ -39,12 +42,39 @@ const (
 )
 
 var (
-	projectID        = os.Getenv("TF_VAR_project_id")
-	uniqueID         = rand.Int() //included as a suffix to the VPC and subnet names.
-	networkName      = fmt.Sprintf("test-vpc-existing-%d", uniqueID)
-	subnetworkName   = fmt.Sprintf("test-subnet-existing-%d", uniqueID)
-	subnetworkIPCIDR = "10.0.0.0/24"
+	projectID          = os.Getenv("TF_VAR_project_id")
+	uniqueID           = rand.Int() //included as a suffix to the VPC and subnet names.
+	networkName        = fmt.Sprintf("test-vpc-existing-%d", uniqueID)
+	subnetworkName     = fmt.Sprintf("test-subnet-existing-%d", uniqueID)
+	subnetworkIPCIDR   = "10.0.0.0/24"
+	createInterconnect = true
 )
+
+// Name of the deployed dedicated interconnect received after deploying the resource in the test lab
+// e.g. dedicated-ix-vpn-client-0
+var deployedInterconnectName = os.Getenv("deployed_interconnect_name")
+
+// Variables for Interconnect configuration.
+var interconnectProjectID = os.Getenv("TF_VAR_interconnect_project_id")
+
+var zone = "us-west2-a"
+var subnetworkIPCidr = "10.0.0.0/24"
+var deletionProtection = false
+
+// Variables for Interconnect configuration.
+var firstInterconnectName = "cso-lab-interconnect-1"
+var secondInterconnectName = "cso-lab-interconnect-2"
+var userSpecifiedIPRange = []string{"0.0.0.0/0", "199.36.154.8/30"}
+
+// First vlan attachment configuration values.
+var firstVaAsn = "65418"
+var firstVlanAttachmentName = "vlan-attachment-a"
+var firstVaBandwidth = "BPS_1G"
+
+// Second vlan attachment configuration values.
+var secondVaAsn = "65418"
+var secondVlanAttachmentName = "vlan-attachment-b"
+var secondVaBandwidth = "BPS_1G"
 
 /*
 This test creates all the resources including the vpc network, subnetwork along with a PSA range.
@@ -396,5 +426,246 @@ func createServiceConnectionPolicy(t *testing.T, projectID string, region string
 	_, err := shell.RunCommandAndGetOutputE(t, cmd)
 	if err != nil {
 		t.Errorf("Error creating Service Connection Policy: %s", err)
+	}
+}
+
+/*
+	TestInterconnectWithVPCCreation tests the creation of
+
+interconnect.tf example by creating a new vpc and a new subnet.
+*/
+func TestInterconnectWithVPCCreation(t *testing.T) {
+	if deployedInterconnectName == "" {
+		t.Skip("Skipping Interconnect testing.")
+	}
+	deploymentNumber, err := strconv.Atoi(deployedInterconnectName[len(deployedInterconnectName)-1:])
+	if err != nil {
+		t.Errorf("Deployment number is not an int, using default value for deployment number.")
+		deploymentNumber = 1
+	}
+	var icRouterBgpAsn = 65000 + deploymentNumber
+	var firstVaBgpRange = fmt.Sprintf("169.254.6%d.0/29", deploymentNumber)
+	var firstVlanTag = 600 + deploymentNumber
+	var secondVaBgpRange = fmt.Sprintf("169.254.6%d.8/29", deploymentNumber)
+	var secondVlanTag = 600 + deploymentNumber
+	var tfVars = map[string]any{
+		"project_id":          projectID,
+		"region":              region,
+		"create_network":      true,
+		"create_subnetwork":   true,
+		"create_nat":          true,
+		"create_havpn":        false,
+		"create_scp_policy":   false,
+		"create_interconnect": createInterconnect,
+		"subnets": []any{
+			map[string]any{
+				"ip_cidr_range": subnetworkIPCIDR,
+				"name":          subnetworkName,
+				"region":        region,
+			},
+		},
+		"network_name":                 networkName,
+		"tunnel_1_bgp_peer_asn":        peerASN,
+		"tunnel_2_bgp_peer_asn":        peerASN,
+		"tunnel_1_bgp_peer_ip_address": tunnel1BGPPeerASNAddress,
+		"tunnel_1_shared_secret":       tunnel1SharedSecret,
+		"tunnel_2_bgp_peer_ip_address": tunnel2BGPPeerASNAddress,
+		"tunnel_2_shared_secret":       tunnel2SharedSecret,
+		"psa_range_name":               psaRangeName,
+		"psa_range":                    psaRange,
+		"user_specified_ip_range":      userSpecifiedIPRange,
+		"interconnect_project_id":      interconnectProjectID,
+		"first_interconnect_name":      firstInterconnectName,
+		"second_interconnect_name":     secondInterconnectName,
+		"first_va_name":                firstVlanAttachmentName,
+		"ic_router_bgp_asn":            icRouterBgpAsn,
+		"first_va_asn":                 firstVaAsn,
+		"first_va_bandwidth":           firstVaBandwidth,
+		"first_va_bgp_range":           firstVaBgpRange,
+		"first_vlan_tag":               firstVlanTag,
+		"second_va_asn":                secondVaAsn,
+		"second_va_name":               secondVlanAttachmentName,
+		"second_va_bandwidth":          secondVaBandwidth,
+		"second_va_bgp_range":          secondVaBgpRange,
+		"second_vlan_tag":              secondVlanTag,
+	}
+
+	terraformOptions := terraform.WithDefaultRetryableErrors(t, &terraform.Options{
+		// Set the path to the Terraform code that will be tested.
+		TerraformDir:         terraformDirectoryPath,
+		Vars:                 tfVars,
+		Reconfigure:          true,
+		Lock:                 true,
+		NoColor:              true,
+		SetVarsAfterVarFiles: true,
+	})
+	initiateTestForNetworkResource(t, terraformOptions, firstVlanTag)
+}
+
+/*
+TestInterconnectWithoutVPCCreation tests the creation of example by using the existing vpc and  subnet.
+*/
+func TestInterconnectWithoutVPCCreation(t *testing.T) {
+	if deployedInterconnectName == "" {
+		t.Skip("Skipping Interconnect testing.")
+	}
+	deploymentNumber, err := strconv.Atoi(deployedInterconnectName[len(deployedInterconnectName)-1:])
+	if err != nil {
+		t.Errorf("Deployment number is not an int, using default value for deployment number.")
+		deploymentNumber = 1
+	}
+	var icRouterBgpAsn = 65000 + deploymentNumber
+	var firstVaBgpRange = fmt.Sprintf("169.254.6%d.0/29", deploymentNumber)
+	var firstVlanTag = 600 + deploymentNumber
+	var secondVaBgpRange = fmt.Sprintf("169.254.6%d.8/29", deploymentNumber)
+	var secondVlanTag = 600 + deploymentNumber
+	ProjectID := projectID
+	var tfVars = map[string]any{
+		"project_id":          projectID,
+		"region":              region,
+		"create_network":      false,
+		"create_subnetwork":   false,
+		"create_nat":          true,
+		"create_havpn":        false,
+		"create_scp_policy":   false,
+		"create_interconnect": createInterconnect,
+		"subnets": []any{
+			map[string]any{
+				"ip_cidr_range": subnetworkIPCIDR,
+				"name":          subnetworkName,
+				"region":        region,
+			},
+		},
+		"network_name":                 networkName,
+		"tunnel_1_bgp_peer_asn":        peerASN,
+		"tunnel_2_bgp_peer_asn":        peerASN,
+		"tunnel_1_bgp_peer_ip_address": tunnel1BGPPeerASNAddress,
+		"tunnel_1_shared_secret":       tunnel1SharedSecret,
+		"tunnel_2_bgp_peer_ip_address": tunnel2BGPPeerASNAddress,
+		"tunnel_2_shared_secret":       tunnel2SharedSecret,
+		"psa_range_name":               psaRangeName,
+		"psa_range":                    psaRange,
+		"user_specified_ip_range":      userSpecifiedIPRange,
+		"interconnect_project_id":      interconnectProjectID,
+		"first_interconnect_name":      firstInterconnectName,
+		"second_interconnect_name":     secondInterconnectName,
+		"first_va_name":                firstVlanAttachmentName,
+		"ic_router_bgp_asn":            icRouterBgpAsn,
+		"first_va_asn":                 firstVaAsn,
+		"first_va_bandwidth":           firstVaBandwidth,
+		"first_va_bgp_range":           firstVaBgpRange,
+		"first_vlan_tag":               firstVlanTag,
+		"second_va_asn":                secondVaAsn,
+		"second_va_name":               secondVlanAttachmentName,
+		"second_va_bandwidth":          secondVaBandwidth,
+		"second_va_bgp_range":          secondVaBgpRange,
+		"second_vlan_tag":              secondVlanTag,
+	}
+
+	terraformOptions := terraform.WithDefaultRetryableErrors(t, &terraform.Options{
+		// Set the path to the Terraform code that will be tested.
+		TerraformDir:         terraformDirectoryPath,
+		Vars:                 tfVars,
+		Reconfigure:          true,
+		Lock:                 true,
+		NoColor:              true,
+		SetVarsAfterVarFiles: true,
+	})
+	// Create VPC and subnet outside of the terraform module
+
+	text := "compute"
+	cmd := shell.Command{
+		Command: "gcloud",
+		Args:    []string{text, "networks", "create", networkName, "--project=" + ProjectID, "--format=json", "--bgp-routing-mode=global", "--subnet-mode=custom", "--verbosity=none"},
+	}
+	_, err = shell.RunCommandAndGetOutputE(t, cmd)
+	if err != nil {
+		log.Printf("===Error %s Encountered while executing %s", err, text)
+	}
+	cmd = shell.Command{
+		Command: "gcloud",
+		Args:    []string{text, "networks", "subnets", "create", subnetworkName, "--network=" + networkName, "--project=" + ProjectID, "--range=10.0.0.0/24", "--region=" + region, "--format=json", "--enable-private-ip-google-access", "--enable-flow-logs", "--verbosity=none"},
+	}
+	_, err = shell.RunCommandAndGetOutputE(t, cmd)
+	if err != nil {
+		log.Printf("===Error %s Encountered while executing %s", err, text)
+	}
+	initiateTestForNetworkResource(t, terraformOptions, firstVlanTag)
+}
+
+/*
+	initiateTestForNetworkResource is a helper function that helps in verification
+
+of the resources being created as part of test.
+*/
+func initiateTestForNetworkResource(t *testing.T, terraformOptions *terraform.Options, firstVlanTag int) {
+	t.Helper()
+
+	// Clean up resources with "terraform destroy" at the end of the test.
+	defer terraform.Destroy(t, terraformOptions)
+
+	// Run "terraform init" and "terraform apply". Fail the test if there are any errors.
+	terraform.InitAndApply(t, terraformOptions)
+
+	// Wait for 60 seconds to let resource achieve stable state.
+	time.Sleep(60 * time.Second)
+
+	log.Println(" ========= Verify Subnet Name ========= ")
+	want := networkName
+	got := terraform.Output(t, terraformOptions, "name")
+	if !cmp.Equal(got, want) {
+		t.Errorf("Test Network Name = %v, want = %v", got, want)
+	}
+	// Validate if interconnects vlans attachments are up & running with Established Connection.
+	log.Println(" ====================================================== ")
+	log.Println(" ========= Verify Interconnect/VLAN Tunnels ========= ")
+
+	var interconnectAttachmentNameList = []string{firstVlanAttachmentName, secondVlanAttachmentName}
+
+	for _, vlanAttachmentName := range interconnectAttachmentNameList {
+		ProjectID := projectID
+		text := "compute"
+		cmd := shell.Command{
+			Command: "gcloud",
+			Args:    []string{"compute", "interconnects", "attachments", "describe", vlanAttachmentName, "--region", region, "--project", ProjectID, "--format=json", "--verbosity=none"},
+		}
+		op, err := shell.RunCommandAndGetOutputE(t, cmd)
+		if err != nil {
+			log.Printf("===Error %s Encountered while executing %s", err, text)
+		}
+		if !gjson.Valid(op) {
+			t.Fatalf("Error parsing output, invalid json: %s", op)
+		}
+		result := gjson.Parse(op)
+		if err != nil {
+			log.Printf("=== Error %s Encountered while executing %s", err, text)
+		}
+		log.Printf(" \n========= Validating attachment %s ============\n", vlanAttachmentName)
+		log.Println(" ========= Check if attach Operation Status is active ========= ")
+		want = "OS_ACTIVE"
+		got = gjson.Get(result.String(), "operationalStatus").String()
+		if !cmp.Equal(got, want) {
+			t.Errorf("Test VLAN Operational State = %v, want = %v", got, want)
+		}
+		log.Println(" ========= Check if state is Active ========= ")
+		want = "ACTIVE"
+		got = gjson.Get(result.String(), "state").String()
+		if !cmp.Equal(got, want) {
+			t.Errorf("Test VLAN State = %v, want = %v", got, want)
+		}
+		log.Println(" ========= Check if type is Dedicated ========= ")
+		want = "DEDICATED"
+		got = gjson.Get(result.String(), "type").String()
+		if !cmp.Equal(got, want) {
+			t.Errorf("Test Interconnect type = %v, want = %v", got, want)
+		}
+
+		log.Println(" ========= Check if vlan tag is Same as Configured ========= ")
+		want = strconv.Itoa(firstVlanTag)
+		got = gjson.Get(result.String(), "vlanTag8021q").String()
+		if !cmp.Equal(got, want) {
+			t.Errorf("Test VLAN tag = %v, want = %v", got, want)
+		}
+
 	}
 }
