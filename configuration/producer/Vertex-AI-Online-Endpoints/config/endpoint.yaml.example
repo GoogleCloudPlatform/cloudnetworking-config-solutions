@@ -1,0 +1,7 @@
+name         : <endpoint-name>
+project      : <project-id>
+display_name : <endpoint-display-name>
+description  : <endpoint-description-name>
+location     : <endpoint-location>
+region       : <endpoint-region>
+network      : <endpoint-vpc> # In format : projects/<project-id>/global/networks/<endpoint1-vpc-name>
