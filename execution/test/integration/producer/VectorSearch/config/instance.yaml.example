@@ -1,0 +1,15 @@
+project_id: dummy-project-id
+region: us-central1
+index_display_name : yaml-index
+index_description : created using yaml
+index_update_method : BATCH_UPDATE
+dimension: 2
+approximate_neighbors_count: 150
+shard_size: SHARD_SIZE_SMALL
+distance_measure_type: DOT_PRODUCT_DISTANCE
+index_endpoint_display_name : yaml-endpoint1
+index_endpoint_network : projects/dummy-project-number/global/networks/dummy-vpc-network-name
+tree_ah_config:
+  leaf_node_embedding_count: 500
+  leaf_nodes_to_search_percent: 7
+brute_force_config: null
