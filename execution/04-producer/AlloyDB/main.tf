@@ -14,7 +14,7 @@
 
 module "alloy_db" {
   source                      = "GoogleCloudPlatform/alloy-db/google"
-  version                     = "~> 2.3.0"
+  version                     = "~> 3.2.0"
   for_each                    = { for alloydb in local.instance_list : alloydb.cluster_display_name => alloydb }
   project_id                  = each.value.project_id
   cluster_id                  = each.value.cluster_id
