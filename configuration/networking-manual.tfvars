@@ -1,26 +1,20 @@
 psc_endpoints = [
   {
-    endpoint_project_id          = ""
     producer_instance_project_id = ""
-    producer_instance_name       = "sql-1"
+    endpoint_project_id          = ""
+    target                       = "" # in format "projects/xxx-tp/regions/xx-central1/serviceAttachments/gkedpm-xxx"
     subnetwork_name              = "subnetwork-1"
     network_name                 = "network-1"
-    ip_address_literal           = "10.128.0.50"
+    ip_address_literal           = "10.128.0.26"
+    region                       = "" # Example : us-central1
   },
   {
-    endpoint_project_id          = ""
     producer_instance_project_id = ""
-    producer_instance_name       = "sql-2"
+    endpoint_project_id          = ""
     subnetwork_name              = "subnetwork-2"
     network_name                 = "network-2"
-    ip_address_literal           = ""
-  },
-  {
-    endpoint_project_id          = ""
-    producer_instance_project_id = ""
-    producer_instance_name       = "sql-3"
-    subnetwork_name              = "subnetwork-3"
-    network_name                 = "network-3"
-    ip_address_literal           = ""
+    ip_address_literal           = "10.128.0.27"
+    region                       = ""                  # Example : us-central2
+    producer_instance_name       = "psc-instance-name" # Can only be used for CloudSQL
   }
 ]

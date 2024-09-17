@@ -13,16 +13,40 @@
 # limitations under the License.
 
 variable "psc_endpoints" {
-  description = "List of service attachment configurations"
+  description = "List of PSC Endpoint configurations"
   type = list(object({
-    endpoint_project_id          = string
+    # The Google Cloud project ID where the forwarding rule and address will be created.
+    endpoint_project_id = string
+
+    # The Google Cloud project ID where the Cloud SQL instance is located.
     producer_instance_project_id = string
-    producer_instance_name       = string
-    subnetwork_name              = string
-    network_name                 = string
-    ip_address_literal           = optional(string, "")
-    allow_psc_global_access      = optional(bool, false)     # Added optional field with default value of false
-    labels                       = optional(map(string), {}) # Added optional labels field
+
+    # The name of the subnet where the internal IP address will be allocated.
+    subnetwork_name = string
+
+    # The name of the network where the forwarding rule will be created.
+    network_name = string
+
+    # The region where the forwarding rule and address will be created.
+    region = optional(string)
+
+    # Optional: The static internal IP address to use. If not provided,
+    # Google Cloud will automatically allocate an IP address.
+    ip_address_literal = optional(string, "")
+    # Allow access to the PSC endpoint from any region.
+    allow_psc_global_access = optional(bool, false)
+    # Resource labels to apply to the forwarding rule.
+    labels = optional(map(string), {})
+
+    # Either producer_instance_name OR target must be specified, but not both
+    producer_instance_name = optional(string)
+    target                 = optional(string)
   }))
-  default = []
+  validation {
+    condition = alltrue([
+      for config in var.psc_endpoints :
+      (config.producer_instance_name != null && config.target == null) || (config.producer_instance_name == null && config.target != null)
+    ])
+    error_message = "Exactly one of 'producer_instance_name' or 'target' must be specified for each PSC endpoint."
+  }
 }

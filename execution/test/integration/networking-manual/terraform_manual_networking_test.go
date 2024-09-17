@@ -28,19 +28,22 @@ import (
 
 // Constants for the Terraform directory path and plan file path.
 const (
-	terraformDirectoryPath        = "../../../05-networking-manual/" // Replace with the actual path to your Terraform code directory
-	planFilePath                  = "./plan"                         // Path where Terraform will save the execution plan
-	producerInstanceNameWithoutIP = "sql"                            // Replace with your actual SQL instance name for testing without IP
-	producerInstanceNameWithIP    = "sql-1"                          // Replace with your actual SQL instance name for testing with IP
-
+	terraformDirectoryPath = "../../../05-networking-manual/" // Replace with the actual path to your Terraform code directory
+	planFilePath           = "./plan"                         // Path where Terraform will save the execution plan
 )
 
+// Define the names of the producer SQL instances to be tested with their Service Attachments
+
 var (
-	// Define the names of the producer SQL instances to be tested.
-	producerInstanceNames = []string{"sql", "sql-1"} // Replace with your actual instance names to be tested in total (2 to be added)
-	networkName           = "default"
-	subnetworkName        = "default"
-	ipAddressLiteral      = "10.128.0.48"
+	producerInstanceNameWithoutIP = "psc"                                                               // Replace with your actual SQL instance name for testing without IP
+	producerInstanceNameWithIP    = "psc-instance"                                                      // Replace with your actual SQL instance name for testing with IP
+	targetLink                    = "target-link"                                                       // Define in format projects/project-tp/regions/region/serviceAttachments/unique-id"
+	producerInstanceNames         = []string{producerInstanceNameWithoutIP, producerInstanceNameWithIP} // Replace with your actual instance names to be tested in total (2 to be added)
+	networkName                   = "default"                                                           // Replace with an existing VPC Network
+	subnetworkName                = "default"                                                           // Replace with an existing subnet
+	ipAddressLiteral              = "10.128.0.30"                                                       // Replace with an available IP Address
+	ipAddressLiteralWithTarget    = "10.128.0.31"                                                       // Replace with an available IP Address
+	region                        = "us-central1"                                                       // Replace with your chosen region
 )
 
 // Global variable to store the Terraform variables used in tests.
@@ -369,4 +372,91 @@ func assertOutputsForAutoAllocatedIPAddress(t *testing.T, tfOptions *terraform.O
 
 	// Assert that the IP address is not nil (since it should have been auto-allocated).
 	assert.NotNil(t, actualIPAddress, "IP address is nil")
+}
+
+// TestPSCForwardingRuleModuleWithTarget tests the Terraform module
+// that creates a forwarding rule with a user-specified target (service attachment link).
+func TestPSCForwardingRuleModuleWithTarget(t *testing.T) {
+	// Configure Terraform options for the test, including variables
+	tfOptions := configureTerraformOptionsWithTarget(t)
+
+	// Ensure resources are cleaned up after the test
+	defer terraform.Destroy(t, tfOptions)
+
+	// Initialize Terraform and apply the configuration
+	terraform.InitAndApply(t, tfOptions)
+
+	// Verify the created resources and their outputs
+	assertOutputsWithTarget(t, tfOptions)
+}
+
+// configureTerraformOptionsWithTarget configures Terraform options for testing with a target specified.
+// It reads environment variables for project IDs and sets up the required Terraform variables.
+func configureTerraformOptionsWithTarget(t *testing.T) *terraform.Options {
+	// Retrieve the project ID from environment variables
+	endpointProjectID := os.Getenv("TF_VAR_endpoint_project_id")
+
+	// Assert that the project ID is set
+	assert.NotEmpty(t, endpointProjectID, "Environment variable 'TF_VAR_endpoint_project_id' must be set")
+
+	// Retrieve or set the producer project ID (if not specified, it defaults to the same as the project ID)
+	producerProjectID := os.Getenv("TF_VAR_producer_project_id")
+	if producerProjectID == "" {
+		producerProjectID = endpointProjectID
+	}
+
+	// Create a map of Terraform variables
+	tfVars := map[string]interface{}{
+		"psc_endpoints": []interface{}{
+			map[string]interface{}{
+				"endpoint_project_id":          endpointProjectID,          // Project ID for the endpoint
+				"producer_instance_project_id": producerProjectID,          // Project ID where the service attachment resides
+				"target":                       targetLink,                 // Service attachment link
+				"subnetwork_name":              subnetworkName,             // Modifiable Subnetwork name for the forwarding rule
+				"network_name":                 networkName,                // Modifiable Network name for the forwarding rule
+				"ip_address_literal":           ipAddressLiteralWithTarget, // Specify the IP address to use
+				"region":                       region,                     // Specify the region
+			},
+		},
+	}
+
+	// Return the Terraform options with default retryable errors handling
+	return terraform.WithDefaultRetryableErrors(t, &terraform.Options{
+		TerraformDir: terraformDirectoryPath, // Path to the Terraform code
+		Vars:         tfVars,                 // Set the Terraform variables
+	})
+}
+
+// assertOutputsWithTarget verifies the outputs of the Terraform module when using a target.
+func assertOutputsWithTarget(t *testing.T, tfOptions *terraform.Options) {
+	// Get the forwarding rule self-link output
+	actualForwardingRuleSelfLinkMap := terraform.OutputMap(t, tfOptions, "forwarding_rule_self_link")
+
+	// Get the IP address output
+	actualIPAddressMap := terraform.OutputMap(t, tfOptions, "ip_address_literal")
+
+	// Extract the target from the Terraform options
+	target := tfOptions.Vars["psc_endpoints"].([]interface{})[0].(map[string]interface{})["target"].(string)
+
+	// Construct the expected forwarding rule name (using a "custom-" prefix since no instance name is provided)
+	expectedForwardingRuleName := "psc-forwarding-rule-custom-0"
+
+	// Get the actual forwarding rule self link and extract the name
+	actualForwardingRuleSelfLink := actualForwardingRuleSelfLinkMap["0"]
+	parts := strings.Split(actualForwardingRuleSelfLink, "/")
+	actualForwardingRuleName := parts[len(parts)-1]
+
+	// Get the actual IP address
+	actualIPAddress := actualIPAddressMap["0"]
+
+	// Assert that the forwarding rule name matches the expected name
+	assert.Equal(t, expectedForwardingRuleName, actualForwardingRuleName, "Forwarding rule name mismatch")
+
+	// Assert that the IP address is not nil
+	assert.NotNil(t, actualIPAddress, "IP address is nil")
+
+	// Assert that the target in the forwarding rule matches the provided target
+	actualTargetMap := terraform.OutputMap(t, tfOptions, "forwarding_rule_target") // Get the output as a map
+	actualTarget := actualTargetMap["0"]                                           // Access the target value using the key "0"
+	assert.Equal(t, target, actualTarget, "Target mismatch")
 }
