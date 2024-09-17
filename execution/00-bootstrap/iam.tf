@@ -103,7 +103,9 @@ module "producer" {
     (var.network_serviceproject_id) = [
       "roles/cloudsql.admin",
       "roles/alloydb.admin",
-      "roles/redis.admin"
+      "roles/redis.admin",
+      "roles/aiplatform.admin",
+      "roles/container.admin"
     ]
   }
   iam_storage_roles = {
@@ -124,8 +126,7 @@ module "networking_manual" {
   }
   iam_project_roles = {
     (var.network_serviceproject_id) = [
-      "roles/cloudsql.admin",
-      "roles/alloydb.admin"
+      "roles/cloudsql.admin"
     ]
   }
   iam_storage_roles = {
