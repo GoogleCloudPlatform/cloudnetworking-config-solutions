@@ -8,6 +8,8 @@ activate_api_identities = {
       # "iam.googleapis.com",
       # "compute.googleapis.com",
       # "redis.googleapis.com",
+      # "aiplatform.googleapis.com",
+      # "container.googleapis.com"
     ],
   },
 }
