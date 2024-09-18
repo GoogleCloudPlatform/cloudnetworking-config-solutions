@@ -63,7 +63,8 @@ To get you started, we've included sample `terraform.tfvars` configuration files
         "compute.googleapis.com",
         "redis.googleapis.com",
         "aiplatform.googleapis.com",
-        "container.googleapis.com"
+        "container.googleapis.com",
+        "run.googleapis.com",
       ],
     },
   }
