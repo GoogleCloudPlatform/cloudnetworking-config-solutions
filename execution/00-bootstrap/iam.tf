@@ -151,7 +151,8 @@ module "consumer" {
     ]
     (var.network_serviceproject_id) = [
       "roles/compute.instanceAdmin.v1",
-      "roles/iam.serviceAccountUser"
+      "roles/iam.serviceAccountUser",
+      "roles/run.admin"
     ]
   }
   iam_storage_roles = {
