@@ -12,7 +12,35 @@ This directory serves as a centralized repository for all Terraform configuratio
     - MRC (mrc.tfvars)
     - Cloud SQL (sql.tfvars)
     - GCE (gce.tfvars)
+- 04-producer stage
+    - AlloyDB
+      - alloydb.tfvars
+      - config
+        - instance.yaml.example
+    - MRC
+      - mrc.tfvars
+      - config
+        - instance.yaml.example
+    - Cloud SQL
+      - sql.tfvars
+      - config
+        - instance.yaml.example
 - 05-networking-manual stage (networking-manual.tfvars)
+- 06-consumer stage
+  - GCE
+        - gce.tfvars
+        - config
+          - instance.yaml.example
+  - CloudRun
+    - Job
+      - cloudrunjob.tfvars
+      - config
+          - instance.yaml.example
+    - Service
+      - cloudrunservice.tfvars
+      - config
+          - instance.yaml.example
+    
 
 # Usage
 
@@ -156,7 +184,7 @@ egress_rules = {
 
 ## 04-producer
 
-Producer specific configuration examples can be found under the `/config` folder of that specific producer. Such as for AlloyDB, the example would be in the folder `04-producer/AlloyDB/config`.
+Producer specific configuration examples can be found under the `/config` folder of that specific producer. Such as for AlloyDB, the example would be in the folder `configuration/producer/AlloyDB/config/instance.yaml.example`.
 
 ## 05-networking-manual (networking-manual.tfvars)
 
@@ -192,7 +220,7 @@ psc_endpoints = [
 
 ## 06-consumer
 
-Consumer specific configuration examples can be found under the `/config` folder of that specific consumer. Such as for GCE, the example would be in the folder `06-consumer/GCE/config`.
+Consumer specific configuration examples can be found under the `/config` folder of that specific consumer. Such as for GCE, the example would be in the folder `configuration/consumer/GCE/config/instance1.yaml.example`.
 
 ## Considerations
 
