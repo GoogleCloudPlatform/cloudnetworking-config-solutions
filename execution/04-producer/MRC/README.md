@@ -90,7 +90,6 @@ network_id: projects/test-project/global/networks/network-name
 - Troubleshooting: If you encounter errors during the MRC creation process, verify that all prerequisites are satisfied and that the dependencies between stages are correctly configured.
 
 <!-- BEGIN_TF_DOCS -->
-
 ## Providers
 
 | Name | Version |
@@ -108,7 +107,8 @@ network_id: projects/test-project/global/networks/network-name
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| <a name="input_config_folder_path"></a> [config\_folder\_path](#input\_config\_folder\_path) | Location of YAML files holding MRC configuration values. | `string` | `"./config"` | no |
+| <a name="input_config_folder_path"></a> [config\_folder\_path](#input\_config\_folder\_path) | Location of YAML files holding MRC configuration values. | `string` | `"../../../configuration/producer/MRC/config"` | no |
+| <a name="input_deletion_protection_enabled"></a> [deletion\_protection\_enabled](#input\_deletion\_protection\_enabled) | Indicates if the cluster is deletion protected or not. If the value if set to true, any delete cluster operation will fail. Default value is true. | `bool` | `true` | no |
 | <a name="input_region"></a> [region](#input\_region) | The region in which to create the Redis cluster. | `string` | `"us-central1"` | no |
 | <a name="input_replica_count"></a> [replica\_count](#input\_replica\_count) | Number of replicas per shard in the Redis cluster. | `number` | `1` | no |
 | <a name="input_shard_count"></a> [shard\_count](#input\_shard\_count) | Number of shards (replicas) in the Redis cluster. | `number` | `3` | no |
