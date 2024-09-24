@@ -83,6 +83,7 @@ consumer_stage_administrator          = ["example@example.com"]
         "redis.googleapis.com",
         "aiplatform.googleapis.com",
         "container.googleapis.com",
+        "run.googleapis.com",
       ],
     },
   }
