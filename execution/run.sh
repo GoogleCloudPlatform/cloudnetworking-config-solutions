@@ -51,11 +51,11 @@ stagewise_tfvar_path_map=(
     "03-security/MRC=../../../configuration/security/mrc.tfvars"
     "03-security/CloudSQL=../../../configuration/security/cloudsql.tfvars"
     "03-security/GCE=../../../configuration/security/gce.tfvars"
-    "04-producer/AlloyDB=../../../configuration/producer/alloydb.tfvars"
-    "04-producer/MRC=../../../configuration/producer/mrc.tfvars"
-    "04-producer/CloudSQL=../../../configuration/producer/cloudsql.tfvars"
+    "04-producer/AlloyDB=../../../configuration/producer/AlloyDB/alloydb.tfvars"
+    "04-producer/MRC=../../../configuration/producer/MRC/mrc.tfvars"
+    "04-producer/CloudSQL=../../../configuration/producer/CloudSQL/cloudsql.tfvars"
     "05-networking-manual=../../configuration/networking-manual.tfvars"
-    "06-consumer/GCE=../../../configuration/consumer/gce.tfvars"
+    "06-consumer/GCE=../../../configuration/consumer/GCE/gce.tfvars"
 )
 
 # Define stage to description mapping (excluding "all")
