@@ -1,0 +1,6 @@
+project_id: <project-id>
+region: <region> # e.g. us-central1
+name: <instance-name>
+containers:
+  container-name:
+    image: <image-uri> # e.g."us-docker.pkg.dev/cloudrun/container/hello"
