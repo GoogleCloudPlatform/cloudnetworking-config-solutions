@@ -17,6 +17,10 @@ variable "bootstrap_project_id" {
   type        = string
   description = "Google Cloud Project ID which will be used to create the service account and Google Cloud storage buckets."
 }
+variable "folder_id" {
+  type        = string
+  description = "Google Cloud folder ID designating the parent folder for both the networking host project and the service project."
+}
 variable "network_hostproject_id" {
   type        = string
   description = "Google Cloud Project ID for the networking host project to be used to create networking and security resources."

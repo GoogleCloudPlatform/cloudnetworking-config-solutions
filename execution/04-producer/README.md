@@ -34,7 +34,7 @@ The stage utilizes Terraform modules to streamline the provisioning process and 
 
 ### General Configuration Notes
 
-- YAML Configuration Files: Place YAML files defining each instance's configuration within the config/ directory of the respective service's folder (e.g., cloudsql/config/).
+- YAML Configuration Files: Place YAML files defining each instance's configuration within the config/ directory of the respective service's folder under producer folder in configuration/ (e.g., configuration/producer/CloudSQL/config/).
 
 - Terraform Variables: You can customize the input variables in the .tf files according to your project's requirements.
 

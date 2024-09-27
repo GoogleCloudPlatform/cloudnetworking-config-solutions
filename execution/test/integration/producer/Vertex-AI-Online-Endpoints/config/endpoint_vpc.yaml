@@ -1,0 +1,7 @@
+name: vertexai-name
+project: project-name
+display_name: vertexai-displayname
+description: test-description
+location: us-central1
+region: us-central1
+network: projects/project-number/global/networks/vpc-name

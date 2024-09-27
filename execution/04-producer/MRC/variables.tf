@@ -33,5 +33,11 @@ variable "replica_count" {
 variable "config_folder_path" {
   description = "Location of YAML files holding MRC configuration values."
   type        = string
-  default     = "./config"
+  default     = "../../../configuration/producer/MRC/config"
+}
+
+variable "deletion_protection_enabled" {
+  description = "Indicates if the cluster is deletion protected or not. If the value if set to true, any delete cluster operation will fail. Default value is true."
+  type        = bool
+  default     = true
 }

@@ -37,7 +37,7 @@ The user or service account executing Terraform must have the following roles (o
 
 1. **Configuration** :
 
-    - Create YAML configuration files (e.g., instance1.yaml, instance2.yaml) in the configs directory (or the path specified in the config_folder_path variable).
+    - Create YAML configuration files (e.g., instance1.yaml, instance2.yaml) in the config directory (or the path specified in the config_folder_path variable).
     - Edit the YAML files to specify the desired VM configurations. (See **Examples** below)
 
 2. **Terraform Initialization**:
@@ -53,7 +53,7 @@ The user or service account executing Terraform must have the following roles (o
     - Use the following command to generate an execution plan. This will show you the changes Terraform will make to your Google Cloud infrastructure:
 
     ```
-    terraform plan
+    terraform plan -var-file=../../../configuration/consumer/GCE/gce.tfvars
     ```
 
 Carefully review the plan to ensure it aligns with your intended configuration.
@@ -63,10 +63,10 @@ Carefully review the plan to ensure it aligns with your intended configuration.
     Once you're satisfied with the plan, execute the terraform apply command to provision your GCE instances:
 
     ```
-    terraform apply
+    terraform apply -var-file=../../../configuration/consumer/GCE/gce.tfvars
     ```
 
-Terraform will read the YAML files from the `06-consumer/GCE/configs` folder by default and create the corresponding GCE instances in your Google Cloud project.
+Terraform will read the YAML files from the `configuration/consumer/GCE/config` folder by default and create the corresponding GCE instances in your Google Cloud project.
 
 5. **Monitor and Manage:**
 
@@ -143,7 +143,7 @@ Terraform will read the YAML files from the `06-consumer/GCE/configs` folder by 
 | <a name="input_attached_disks"></a> [attached\_disks](#input\_attached\_disks) | Additional disks, if options is null defaults will be used in its place. Source type is one of 'image' (zonal disks in vms and template), 'snapshot' (vm), 'existing', and null. | <pre>list(object({<br>    name        = string<br>    device_name = optional(string)<br>    # TODO: size can be null when source_type is attach<br>    size              = string<br>    snapshot_schedule = optional(string)<br>    source            = optional(string)<br>    source_type       = optional(string)<br>    options = optional(<br>      object({<br>        auto_delete  = optional(bool, false)<br>        mode         = optional(string, "READ_WRITE")<br>        replica_zone = optional(string)<br>        type         = optional(string, "pd-balanced")<br>      }),<br>      {<br>        auto_delete  = true<br>        mode         = "READ_WRITE"<br>        replica_zone = null<br>        type         = "pd-balanced"<br>      }<br>    )<br>  }))</pre> | `[]` | no |
 | <a name="input_boot_disk"></a> [boot\_disk](#input\_boot\_disk) | Boot disk properties. | <pre>object({<br>    auto_delete       = optional(bool, true)<br>    snapshot_schedule = optional(string)<br>    source            = optional(string)<br>    initialize_params = optional(object({<br>      image = optional(string, "projects/debian-cloud/global/images/family/debian-11")<br>      size  = optional(number, 10)<br>      type  = optional(string, "pd-balanced")<br>    }))<br>    use_independent_disk = optional(bool, false)<br>  })</pre> | <pre>{<br>  "initialize_params": {}<br>}</pre> | no |
 | <a name="input_can_ip_forward"></a> [can\_ip\_forward](#input\_can\_ip\_forward) | Enable IP forwarding. | `bool` | `false` | no |
-| <a name="input_config_folder_path"></a> [config\_folder\_path](#input\_config\_folder\_path) | Location of YAML files holding GCE configuration values. | `string` | `"./configs"` | no |
+| <a name="input_config_folder_path"></a> [config\_folder\_path](#input\_config\_folder\_path) | Location of YAML files holding GCE configuration values. | `string` | `"./config"` | no |
 | <a name="input_create_template"></a> [create\_template](#input\_create\_template) | Create instance template instead of instances. | `bool` | `false` | no |
 | <a name="input_description"></a> [description](#input\_description) | Description of a Compute Instance. | `string` | `"Managed by the compute-vm Terraform module."` | no |
 | <a name="input_enable_display"></a> [enable\_display](#input\_enable\_display) | Enable virtual display on the instances. | `bool` | `false` | no |

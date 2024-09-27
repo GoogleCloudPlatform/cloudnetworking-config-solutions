@@ -14,6 +14,7 @@
 
 # Outputs the self-links of the forwarding rules created for each service attachment. 
 # The map uses the SQL instance names as keys and the self-links as values.
+
 output "forwarding_rule_self_link" {
   value       = { for k, v in google_compute_forwarding_rule.psc_forwarding_rule : k => v.self_link }
   description = "Self-links of the created forwarding rules"
@@ -31,4 +32,9 @@ output "address_self_link" {
 output "ip_address_literal" {
   value       = { for k, v in google_compute_address.psc_address : k => v.address }
   description = "IP addresses of the created addresses"
+}
+
+output "forwarding_rule_target" {
+  value       = local.forwarding_rule_targets
+  description = "Map of forwarding rule targets, keyed by endpoint index"
 }

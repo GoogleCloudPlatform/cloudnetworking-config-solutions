@@ -248,5 +248,5 @@ variable "users" {
 variable "config_folder_path" {
   description = "Location of YAML files holding Cloud SQL configuration values."
   type        = string
-  default     = "config"
+  default     = "../../../configuration/producer/CloudSQL/config"
 }

@@ -28,11 +28,11 @@ With the prerequisites in place and your Cloud SQL configuration files ready, yo
 
 1. **Create your configuration files:**
 
-    * Create YAML files defining the properties of each Cloud SQL instance you want to create. Ensure these files are stored in the `CloudSQL/config` folder within this repository.
+    * Create YAML files defining the properties of each Cloud SQL instance you want to create. Ensure these files are stored in the `configuration/producer/CloudSQL/config` folder within this repository.
 
     * Each YAML file should map to a single Cloud SQL instance providing details such as instance name, region, database version and networking configuration. Each field and its structure are described in the [input section](#inputs) below.
 
-    * For reference on how to structure your Cloud SQL configuration YAML files, see the [example](#example) section below or refer to sample YAML file at folder location `CloudSQL/config/instance.yaml.example`. These examples provide templates that you can adapt to your specific needs.
+    * For reference on how to structure your Cloud SQL configuration YAML files, see the [example](#example) section below or refer to sample YAML file at folder location `configuration/producer/CloudSQL/config/instance.yaml.example`. These examples provide templates that you can adapt to your specific needs.
 
 
 2. **Initialize Terraform:**
@@ -49,7 +49,7 @@ With the prerequisites in place and your Cloud SQL configuration files ready, yo
     * Use the terraform plan command to generate an execution plan. This will show you the changes Terraform will make to your Google Cloud infrastructure:
 
     ```
-    terraform plan
+    terraform plan -var-file=../../../configuration/producer/CloudSQL/cloudsql.tfvars
     ```
 
 Carefully review the plan to ensure it aligns with your intended configuration.
@@ -59,10 +59,10 @@ Carefully review the plan to ensure it aligns with your intended configuration.
     Once you're satisfied with the plan, execute the terraform apply command to provision your Cloud SQL instances:
 
     ```
-    terraform apply
+    terraform apply -var-file=../../../configuration/producer/CloudSQL/cloudsql.tfvars
     ```
 
-Terraform will read the YAML files from the `04-producer/CloudSQL/config` folder and create the corresponding Cloud SQL instances in your Google Cloud project.
+Terraform will read the YAML files from the `configuration/producer/CloudSQL/config` folder and create the corresponding Cloud SQL instances in your Google Cloud project.
 
 5. **Monitor and Manage:**
     * After the instances are created, you can monitor their status, performance, and logs through the Google Cloud Console or using the Google Cloud CLI.

@@ -18,7 +18,6 @@ import (
 	"math/rand"
 	"os"
 	"path/filepath"
-	"strings"
 	"testing"
 	"time"
 
@@ -38,18 +37,20 @@ var (
 )
 
 var (
-	projectID    = os.Getenv("TF_VAR_project_id")
-	region       = "us-central1"
-	instanceName = fmt.Sprintf("mrc-%d", rand.Int())
-	networkName  = fmt.Sprintf("vpc-%s-test", instanceName)
-	networkID    = fmt.Sprintf("projects/%s/global/networks/%s", projectID, networkName)
+	projectID                 = os.Getenv("TF_VAR_project_id")
+	region                    = "us-central1"
+	instanceName              = fmt.Sprintf("mrc-%d", rand.Int())
+	networkName               = fmt.Sprintf("vpc-%s-test", instanceName)
+	networkID                 = fmt.Sprintf("projects/%s/global/networks/%s", projectID, networkName)
+	deletionProtectionEnabled = false
 )
 
 type MRCStruct struct {
-	InstanceName string `yaml:"redis_cluster_name"`
-	ProjectID    string `yaml:"project_id"`
-	NetworkID    string `yaml:"network_id"`
-	Region       string `yaml:"region"`
+	InstanceName              string `yaml:"redis_cluster_name"`
+	ProjectID                 string `yaml:"project_id"`
+	NetworkID                 string `yaml:"network_id"`
+	Region                    string `yaml:"region"`
+	DeletionProtectionEnabled bool   `yaml:"deletion_protection_enabled"`
 }
 
 // GetFirstNonEmptyEnvVarOrUseDefault retrieves the first non-empty environment variable
@@ -128,7 +129,7 @@ func TestCreateMRC(t *testing.T) {
 			expectedNetworkID := value.Get("network").String()
 			cmd := shell.Command{
 				Command: "gcloud",
-				Args:    []string{"redis", "clusters", "describe", instanceName, "--project=" + projectID, "--region=" + region, "--format=json"},
+				Args:    []string{"redis", "clusters", "describe", instanceName, "--project=" + projectID, "--region=" + region, "--format=json", "--verbosity=none", "--quiet"},
 			}
 			output, err := shell.RunCommandAndGetOutputE(t, cmd)
 			if err != nil {
@@ -260,39 +261,7 @@ func deleteVPC(t *testing.T, projectID string, networkName string) {
 		t.Errorf("===Error %s Encountered while executing %s", err, text)
 	}
 
-	// 3. Delete Firewall Rules (with fixes)
-	// Wait for subnet deletion to complete BEFORE deleting firewalls
-	time.Sleep(60 * time.Second)
-	cmd = shell.Command{
-		Command: "gcloud",
-		Args: []string{
-			text, "firewall-rules", "list",
-			"--filter", fmt.Sprintf("NETWORK=%s", networkName),
-			"--format", "value(name)",
-			"--project=" + projectID,
-			"--quiet",
-		},
-	}
-	firewallNamesOutput, err := shell.RunCommandAndGetOutputE(t, cmd)
-	if err != nil {
-		t.Errorf("===Error listing firewalls: %s Encountered while executing %s", err, text)
-	}
-
-	// Split output and filter empty lines
-	firewallNames := strings.Fields(firewallNamesOutput) // Use `Fields` to split on whitespace
-	for _, firewallName := range firewallNames {
-		// Reassign `cmd` instead of redeclaring it
-		cmd = shell.Command{
-			Command: "gcloud",
-			Args:    []string{text, "firewall-rules", "delete", firewallName, "--project=" + projectID, "--quiet"},
-		}
-		_, err = shell.RunCommandAndGetOutputE(t, cmd)
-		if err != nil {
-			t.Errorf("===Error deleting firewall %s: %s Encountered while executing %s", firewallName, err, text)
-		}
-	}
-
-	// 4. Delete VPC
+	// 3. Delete VPC
 	time.Sleep(120 * time.Second) // Wait for firewall deletion to complete
 	cmd = shell.Command{
 		Command: "gcloud",
@@ -311,10 +280,11 @@ for an MRC instance.
 func createConfigYAML(t *testing.T) {
 	t.Log("========= YAML File =========")
 	instance1 := MRCStruct{
-		InstanceName: instanceName,
-		ProjectID:    projectID,
-		NetworkID:    networkID,
-		Region:       region,
+		InstanceName:              instanceName,
+		ProjectID:                 projectID,
+		NetworkID:                 networkID,
+		Region:                    region,
+		DeletionProtectionEnabled: deletionProtectionEnabled,
 	}
 
 	yamlData, err := yaml.Marshal(&instance1)

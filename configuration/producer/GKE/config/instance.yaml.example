@@ -1,0 +1,7 @@
+name : <cluster-name>
+project_id : <project-id>
+network : <cluster-vpc>
+subnetwork : <cluster-vpc-subnetwork>
+ip_range_pods : <cluster-range-for-pods>
+ip_range_services : <cluster-range-for-services>
+kubernetes_version : <cluster-version> # e.g. : 1.27
