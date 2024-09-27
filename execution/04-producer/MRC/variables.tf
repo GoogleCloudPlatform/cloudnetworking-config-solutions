@@ -35,3 +35,9 @@ variable "config_folder_path" {
   type        = string
   default     = "../../../configuration/producer/MRC/config"
 }
+
+variable "deletion_protection_enabled" {
+  description = "Indicates if the cluster is deletion protected or not. If the value if set to true, any delete cluster operation will fail. Default value is true."
+  type        = bool
+  default     = true
+}

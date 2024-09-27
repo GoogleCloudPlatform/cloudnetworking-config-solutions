@@ -37,18 +37,20 @@ var (
 )
 
 var (
-	projectID    = os.Getenv("TF_VAR_project_id")
-	region       = "us-central1"
-	instanceName = fmt.Sprintf("mrc-%d", rand.Int())
-	networkName  = fmt.Sprintf("vpc-%s-test", instanceName)
-	networkID    = fmt.Sprintf("projects/%s/global/networks/%s", projectID, networkName)
+	projectID                 = os.Getenv("TF_VAR_project_id")
+	region                    = "us-central1"
+	instanceName              = fmt.Sprintf("mrc-%d", rand.Int())
+	networkName               = fmt.Sprintf("vpc-%s-test", instanceName)
+	networkID                 = fmt.Sprintf("projects/%s/global/networks/%s", projectID, networkName)
+	deletionProtectionEnabled = false
 )
 
 type MRCStruct struct {
-	InstanceName string `yaml:"redis_cluster_name"`
-	ProjectID    string `yaml:"project_id"`
-	NetworkID    string `yaml:"network_id"`
-	Region       string `yaml:"region"`
+	InstanceName              string `yaml:"redis_cluster_name"`
+	ProjectID                 string `yaml:"project_id"`
+	NetworkID                 string `yaml:"network_id"`
+	Region                    string `yaml:"region"`
+	DeletionProtectionEnabled bool   `yaml:"deletion_protection_enabled"`
 }
 
 // GetFirstNonEmptyEnvVarOrUseDefault retrieves the first non-empty environment variable
@@ -278,10 +280,11 @@ for an MRC instance.
 func createConfigYAML(t *testing.T) {
 	t.Log("========= YAML File =========")
 	instance1 := MRCStruct{
-		InstanceName: instanceName,
-		ProjectID:    projectID,
-		NetworkID:    networkID,
-		Region:       region,
+		InstanceName:              instanceName,
+		ProjectID:                 projectID,
+		NetworkID:                 networkID,
+		Region:                    region,
+		DeletionProtectionEnabled: deletionProtectionEnabled,
 	}
 
 	yamlData, err := yaml.Marshal(&instance1)
