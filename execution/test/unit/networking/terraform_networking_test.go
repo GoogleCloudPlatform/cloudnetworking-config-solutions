@@ -44,6 +44,7 @@ var (
 		"create_subnetwork":      true,
 		"create_nat":             true,
 		"create_havpn":           true,
+		"create_interconnect":    true,
 		"create_scp_policy":      true,
 		"subnets_for_scp_policy": []interface{}{"unit-test-subnet-1"}, // Changed to []interface{}
 		"subnets": []any{
@@ -65,8 +66,44 @@ var (
 		"tunnel_1_shared_secret":       tunnel1SharedSecret,
 		"tunnel_2_bgp_peer_ip_address": tunnel2BGPPeerASNAddress,
 		"tunnel_2_shared_secret":       tunnel2SharedSecret,
+		"interconnect_project_id":      interconnectProjectID,
+		"first_interconnect_name":      firstInterconnectName,
+		"second_interconnect_name":     secondInterconnectName,
+		"ic_router_bgp_asn":            icRouterBgpAsn,
+		"first_va_asn":                 firstVaAsn,
+		"first_va_bandwidth":           firstVaBandwidth,
+		"first_va_bgp_range":           firstVaBgpRange,
+		"first_vlan_tag":               firstVlanTag,
+		"second_va_asn":                secondVaAsn,
+		"second_va_bandwidth":          secondVaBandwidth,
+		"second_va_bgp_range":          secondVaBgpRange,
+		"second_vlan_tag":              secondVlanTag,
 	}
 )
+
+// variables for Interconnect Configuration
+var zone = "us-west2-a"
+var subnetworkName = "cloudsql-easy-subnet"
+var subnetworkIPCidr = "10.2.0.0/16"
+var deletionProtection = false
+
+// variables for Interconnect configuration
+var interconnectProjectID = "dummy-interconnect-project-id"
+var firstInterconnectName = "cso-lab-interconnect-1"
+var secondInterconnectName = "cso-lab-interconnect-2"
+var icRouterBgpAsn = 65004
+
+// first vlan attachment configuration values
+var firstVaAsn = "65418"
+var firstVaBandwidth = "BPS_1G"
+var firstVaBgpRange = "169.254.61.0/29"
+var firstVlanTag = 601
+
+// second vlan attachment configuration values
+var secondVaAsn = "65418"
+var secondVaBandwidth = "BPS_1G"
+var secondVaBgpRange = "169.254.61.8/29"
+var secondVlanTag = 601
 
 func TestInitAndPlanRunWithTfVars(t *testing.T) {
 	/*
@@ -130,7 +167,7 @@ func TestResourcesCount(t *testing.T) {
 	})
 	planStruct := terraform.InitAndPlan(t, terraformOptions)
 	resourceCount := terraform.GetResourceCount(t, planStruct)
-	if got, want := resourceCount.Add, 22; got != want {
+	if got, want := resourceCount.Add, 29; got != want {
 		t.Errorf("Test Resource Count Add = %v, want = %v", got, want)
 	}
 	if got, want := resourceCount.Change, 0; got != want {
@@ -144,7 +181,7 @@ func TestResourcesCount(t *testing.T) {
 func TestTerraformModuleResourceAddressListMatch(t *testing.T) {
 	// Construct the terraform options with default retryable errors to handle the most common
 	// retryable errors in terraform testing.
-	expectedModuleAddresses := []string{"module.vpc_network", "module.nat[0]", "module.havpn[0]"}
+	expectedModuleAddresses := []string{"module.vpc_network", "module.vlan_attachment_a[0]", "module.vlan_attachment_b[0]", "module.havpn[0]", "module.nat[0]"}
 	terraformOptions := terraform.WithDefaultRetryableErrors(t, &terraform.Options{
 		// Set the path to the Terraform code that will be tested.
 		TerraformDir: terraformDirectoryPath,
@@ -176,28 +213,35 @@ func TestTerraformModuleResourceAddressListMatch(t *testing.T) {
 func TestTerraformResourceAddressListMatch(t *testing.T) {
 	expectedResourceAddresses := []string{
 		"data.google_compute_network.vpc_network",
-		"module.vpc_network.google_compute_network.network[0]",
-		"module.vpc_network.google_service_networking_connection.psa_connection[0]",
+		"google_compute_route.default[0]",
 		"google_network_connectivity_service_connection_policy.policy[0]",
+		"module.havpn[0].google_compute_ha_vpn_gateway.ha_gateway[0]",
 		"module.havpn[0].google_compute_router.router[0]",
-		"module.havpn[0].google_compute_vpn_tunnel.tunnels[\"remote-1\"]",
-		"module.havpn[0].google_compute_vpn_tunnel.tunnels[\"remote-0\"]",
-		"module.vpc_network.google_compute_global_address.psa_ranges[\"psarange\"]",
-		"module.vpc_network.google_compute_network_peering_routes_config.psa_routes[0]",
-		"module.vpc_network.google_compute_route.gateway[\"restricted-googleapis\"]",
-		"module.vpc_network.google_compute_shared_vpc_host_project.shared_vpc_host[0]",
+		"module.havpn[0].google_compute_router_interface.router_interface[\"remote-0\"]",
 		"module.havpn[0].google_compute_router_interface.router_interface[\"remote-1\"]",
 		"module.havpn[0].google_compute_router_peer.bgp_peer[\"remote-0\"]",
 		"module.havpn[0].google_compute_router_peer.bgp_peer[\"remote-1\"]",
-		"module.vpc_network.google_compute_subnetwork.subnetwork[\"us-central1/unit-test-subnet-1\"]",
+		"module.havpn[0].google_compute_vpn_tunnel.tunnels[\"remote-0\"]",
+		"module.havpn[0].google_compute_vpn_tunnel.tunnels[\"remote-1\"]",
 		"module.havpn[0].random_id.secret",
 		"module.nat[0].google_compute_router.router[0]",
 		"module.nat[0].google_compute_router_nat.nat",
+		"module.vlan_attachment_a[0].google_compute_interconnect_attachment.default",
+		"module.vlan_attachment_a[0].google_compute_router_interface.default[0]",
+		"module.vlan_attachment_a[0].google_compute_router_peer.default[0]",
+		"module.vlan_attachment_b[0].google_compute_interconnect_attachment.default",
+		"module.vlan_attachment_b[0].google_compute_router_interface.default[0]",
+		"module.vlan_attachment_b[0].google_compute_router_peer.default[0]",
+		"module.vpc_network.google_compute_global_address.psa_ranges[\"psarange\"]",
+		"module.vpc_network.google_compute_network.network[0]",
+		"module.vpc_network.google_compute_network_peering_routes_config.psa_routes[0]",
 		"module.vpc_network.google_compute_route.gateway[\"private-googleapis\"]",
+		"module.vpc_network.google_compute_route.gateway[\"restricted-googleapis\"]",
+		"module.vpc_network.google_compute_subnetwork.subnetwork[\"us-central1/unit-test-subnet-1\"]",
 		"module.vpc_network.google_compute_subnetwork.subnetwork[\"us-central1/unit-test-subnet-2\"]",
-		"google_compute_route.default[0]",
-		"module.havpn[0].google_compute_ha_vpn_gateway.ha_gateway[0]",
-		"module.havpn[0].google_compute_router_interface.router_interface[\"remote-0\"]",
+		"module.vpc_network.google_service_networking_connection.psa_connection[0]",
+		"google_compute_router.interconnect-router[0]",
+		"module.vpc_network.google_compute_shared_vpc_host_project.shared_vpc_host[0]",
 	}
 
 	terraformOptions := terraform.WithDefaultRetryableErrors(t, &terraform.Options{

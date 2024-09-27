@@ -13,7 +13,7 @@
 # limitations under the License.
 
 module "google_storage_bucket" {
-  source     = "github.com/GoogleCloudPlatform/cloud-foundation-fabric//modules/gcs"
+  source     = "github.com/GoogleCloudPlatform/cloud-foundation-fabric//modules/gcs?ref=v31.1.0"
   project_id = var.bootstrap_project_id
   name       = var.gcs_bucket_name
   location   = var.gcs_bucket_location

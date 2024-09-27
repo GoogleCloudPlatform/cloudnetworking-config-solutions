@@ -1,0 +1,15 @@
+project_id: <your-project-id>
+region: us-central1
+index_display_name : <your-index-display-name>
+index_update_method : BATCH_UPDATE
+dimension: 2
+approximate_neighbors_count: 150
+shard_size: SHARD_SIZE_SMALL
+distance_measure_type: DOT_PRODUCT_DISTANCE
+index_endpoint_display_name : <your-index-endpoint-display-name>
+index_endpoint_network : projects/<your-project-number>/global/networks/<your-network-name>
+tree_ah_config:
+  leaf_node_embedding_count: 500
+  leaf_nodes_to_search_percent: 7
+brute_force_config: null
+deployed_index_id: deploy_index_id_1

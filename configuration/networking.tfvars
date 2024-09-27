@@ -38,3 +38,7 @@ tunnel_2_router_bgp_session_range = ""
 tunnel_2_bgp_peer_asn             = 64514
 tunnel_2_bgp_peer_ip_address      = ""
 tunnel_2_shared_secret            = ""
+
+## Cloud Interconnect input variables
+
+create_interconnect = false # Use true or false

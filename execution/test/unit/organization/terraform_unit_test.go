@@ -16,11 +16,12 @@ package unittest
 import (
 	compare "cmp"
 	"fmt"
+	"testing"
+
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
 	"github.com/gruntwork-io/terratest/modules/terraform"
 	"golang.org/x/exp/slices"
-	"testing"
 )
 
 const (
@@ -33,7 +34,7 @@ var (
 		"activate_api_identities": map[string]any{
 			projectID: map[string]any{
 				"project_id":    projectID,
-				"activate_apis": []string{"servicenetworking.googleapis.com", "alloydb.googleapis.com", "sqladmin.googleapis.com", "iam.googleapis.com", "compute.googleapis.com"},
+				"activate_apis": []string{"servicenetworking.googleapis.com", "alloydb.googleapis.com", "sqladmin.googleapis.com", "iam.googleapis.com", "compute.googleapis.com", "run.googleapis.com", "aiplatform.googleapis.com", "container.googleapis.com"},
 			},
 		},
 	}
@@ -101,7 +102,7 @@ func TestResourcesCount(t *testing.T) {
 	})
 	planStruct := terraform.InitAndPlan(t, terraformOptions)
 	resourceCount := terraform.GetResourceCount(t, planStruct)
-	if got, want := resourceCount.Add, 5; got != want {
+	if got, want := resourceCount.Add, 8; got != want {
 		t.Errorf("Test Resource Count Add = %v, want = %v", got, want)
 	}
 	if got, want := resourceCount.Change, 0; got != want {

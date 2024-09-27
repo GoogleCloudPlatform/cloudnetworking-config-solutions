@@ -362,5 +362,5 @@ variable "tags" {
 variable "config_folder_path" {
   description = "Location of YAML files holding GCE configuration values."
   type        = string
-  default     = "./configs"
+  default     = "../../../configuration/consumer/GCE/config"
 }

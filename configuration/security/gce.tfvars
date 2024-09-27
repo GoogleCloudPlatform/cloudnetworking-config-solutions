@@ -1,5 +1,5 @@
-project_id   = ""
-network_name = ""
+project_id = ""
+network    = ""
 ingress_rules = [
   {
     name        = "allow-ssh-custom-ranges"

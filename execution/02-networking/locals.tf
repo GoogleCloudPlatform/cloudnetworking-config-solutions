@@ -24,4 +24,10 @@ locals {
     subnet.self_link
     if contains(var.subnets_for_scp_policy, subnet.name)
   ]
+  vlan_attachment_project_id = var.project_id
+  interconnect_project_id    = var.interconnect_project_id
+  first_interconnect_name    = var.first_interconnect_name
+  second_interconnect_name   = var.second_interconnect_name
 }
+
+

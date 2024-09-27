@@ -17,19 +17,20 @@ import (
 	compare "cmp"
 	"encoding/json"
 	"fmt"
+	"os"
+	"testing"
+	"time"
+
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
 	"github.com/gruntwork-io/terratest/modules/terraform"
 	"github.com/tidwall/gjson"
-	"os"
-	"testing"
-	"time"
 )
 
 var (
 	projectID              = os.Getenv("TF_VAR_project_id")
 	terraformDirectoryPath = "../../../01-organization"
-	apisList               = []string{"alloydb.googleapis.com", "compute.googleapis.com", "iam.googleapis.com", "servicenetworking.googleapis.com", "sqladmin.googleapis.com"}
+	apisList               = []string{"aiplatform.googleapis.com", "alloydb.googleapis.com", "compute.googleapis.com", "container.googleapis.com", "iam.googleapis.com", "run.googleapis.com", "servicenetworking.googleapis.com", "sqladmin.googleapis.com"}
 	tfVars                 = map[string]any{
 		"activate_api_identities": map[string]any{
 			projectID: map[string]any{

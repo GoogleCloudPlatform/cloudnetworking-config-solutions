@@ -19,11 +19,12 @@ locals {
   # Create a map directly for the instance list
   instance_list = {
     for instance in local.instances : instance.redis_cluster_name => {
-      project_id    = instance.project_id
-      shard_count   = try(instance.shard_count, var.shard_count)
-      network_id    = instance.network_id
-      region        = try(instance.region, var.region)
-      replica_count = try(instance.replica_count, var.replica_count)
+      project_id                  = instance.project_id
+      shard_count                 = try(instance.shard_count, var.shard_count)
+      network_id                  = instance.network_id
+      region                      = try(instance.region, var.region)
+      deletion_protection_enabled = try(instance.deletion_protection_enabled, var.deletion_protection_enabled)
+      replica_count               = try(instance.replica_count, var.replica_count)
     }
   }
 

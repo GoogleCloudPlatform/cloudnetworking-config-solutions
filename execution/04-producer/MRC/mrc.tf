@@ -15,11 +15,12 @@
 resource "google_redis_cluster" "cluster-ha" {
   for_each = local.instance_list
 
-  name          = each.key
-  project       = each.value.project_id
-  shard_count   = each.value.shard_count
-  region        = each.value.region
-  replica_count = each.value.replica_count
+  name                        = each.key
+  project                     = each.value.project_id
+  shard_count                 = each.value.shard_count
+  region                      = each.value.region
+  replica_count               = each.value.replica_count
+  deletion_protection_enabled = each.value.deletion_protection_enabled
 
   psc_configs {
     network = each.value.network_id

@@ -11,7 +11,7 @@ This stage establishes a Private Service Connect (PSC) connection between your c
 
 ## How It Works
 
-This configuration is designed for flexibility. You can define multiple producer services within your `configuration/networking-manual.tfvars` file.
+This configuration is designed for flexibility. You can define multiple producer services within your `networking-manual.tfvars` file in the `configuration/` folder.
 
 **Key Points:**
 
@@ -20,39 +20,85 @@ This configuration is designed for flexibility. You can define multiple producer
 
 ## Configuration
 
-This stage uses a modularized approach. The psc-forwarding-rules.tf file in the root directory orchestrates the creation of multiple forwarding rules based on the configuration provided in the networking-manual.tfvars file.
+This stage uses a modularized approach. The `psc-forwarding-rules.tf` file in the root directory orchestrates the creation of multiple forwarding rules based on the configuration provided in the `networking-manual.tfvars` file in the `configuration/` folder.
 
-While running this stage, please carefully note the following details :
+While running this stage, please carefully note the following details:
 
-- The variable `psc_endpoints`, is a list of objects, where each object represents a producer (such as Cloud SQL) instance:
+- The variable `psc_endpoints` is a list of objects, where each object represents a connection to a producer service:
 
     - `endpoint_project_id`           = "your-consumer-project-id"  # Project where the forwarding rule is created
     - `producer_instance_project_id`  = "your-producer-project-id"  # Project hosting the service (e.g., Cloud SQL)
-    - `producer_instance_name`        = "your-sql-instance-name"    # Name of the producer service instance
+    - `producer_instance_name`        = "your-sql-instance-name"    # (Optional) Name of the producer service instance
+    - `target`                       = "your-service-attachment-link" # (Optional) Service attachment link
     - `subnetwork_name`               = "your-subnetwork-name"     # Subnet for allocating the internal IP
     - `network_name`                  = "your-network-name"        # VPC network for the forwarding rule
-    - `ip_address_literal`            = ""                 # (Optional) Specific internal IP, or leave empty string for automatic allocation
+    - `ip_address_literal`            = ""                 # (Optional) Specific internal IP, or leave empty for automatic allocation
+    - `region`                       = "your-region"              # Region for the resources
     - `allow_psc_global_access`       = true/false                  # (Optional) Allow global access
     - `labels`                        = { key = "value" }           # (Optional) Labels for resources
 
+- **Either `producer_instance_name` or `target` must be specified, but not both.**
 - **Regions:** Ensure your producer service, subnetwork, and service attachment all reside within the same GCP region.
-- **IP Addresses:** Verify the specified `ip_address` values are available and not already in use.
+- **IP Addresses:** Verify the specified `ip_address_literal` values are available and not already in use.
 
 ## Example configuration/networking-manual.tfvars
+
+Example 1: Connecting to a Cloud SQL instance
+
+This example shows how to connect to a specific Cloud SQL instance using its name.
 
 ```
 psc_endpoints = [
   {
-    endpoint_project_id          = "project-for-endpoint"
-    producer_instance_project_id = "project-producer"
-    producer_instance_name       = "sql-3"
-    subnetwork_name              = "subnetwork-3"
-    network_name                 = "network-3"
-    ip_address_literal           = ""
+    endpoint_project_id          = "your-consumer-project-id"
+    producer_instance_project_id = "your-producer-project-id"
+    producer_instance_name       = "your-cloud-sql-instance-name" 
+    subnetwork_name              = "your-subnetwork-name"
+    network_name                 = "your-network-name"
+    ip_address_literal           = "10.128.0.20"  // Or leave empty for dynamic allocation
+    region                       = "us-central1" 
     allow_psc_global_access      = false
     labels                       = { environment = "dev" }
   },
 ]
+```
+
+Example 2: Connecting to a service attachment
+
+This example demonstrates connecting to a service attachment, which can represent a different type of producer service or a group of instances.
+
+```
+psc_endpoints = [
+  {
+    endpoint_project_id          = "your-consumer-project-id"
+    producer_instance_project_id = "your-producer-project-id"
+    target                       = "projects/your-project/regions/us-central1/serviceAttachments/your-service-attachment-name" 
+    subnetwork_name              = "your-subnetwork-name"
+    network_name                 = "your-network-name"
+    ip_address_literal           = "" // Or specify an IP address if needed
+    region                       = "us-central1"
+    allow_psc_global_access      = false
+    labels                       = { environment = "dev" }
+  },
+]
+```
+
+## Usage
+
+**NOTE** : run the terraform commands with the -var-file referencing the `networking-manual.tfvars` present under the `/configuration` folder. 
+
+Example :
+
+1. **Initialize**: Run `terraform init`.
+2. **Plan**: Run terraform plan -var-file=../../configuration/networking-manual.tfvars to review the planned changes.
+
+```
+terraform plan -var-file=../../configuration/networking-manual.tfvars
+```
+3. **Apply**: If the plan looks good, run terraform apply -var-file=../../configuration/networking-manual.tfvars to create or update the resources.
+
+```
+terraform apply -var-file=../../configuration/networking-manual.tfvars
 ```
 
 <!-- BEGIN_TF_DOCS -->
@@ -60,19 +106,23 @@ psc_endpoints = [
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_psc_forwarding_rules"></a> [psc\_forwarding\_rules](#module\_psc\_forwarding\_rules) | ../modules/psc_forwarding_rule | n/a |
+| <a name="module_psc_forwarding_rules"></a> [psc\_forwarding\_rules](#module\_psc\_forwarding\_rules) | ../../modules/psc_forwarding_rule | n/a |
 
+## Resources
+
+No resources.
 
 ## Inputs
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| <a name="input_psc_endpoints"></a> [psc\_endpoints](#input\_psc\_endpoints) | List of PSC Endpoint configurations | <pre>list(object({<br>    # The Google Cloud project ID where the Cloud SQL instance is located.<br>    producer_instance_project_id = string<br><br>    # The Google Cloud project ID where the forwarding rule and address will be created.<br>    endpoint_project_id = string<br><br>    # The name of the Cloud SQL instance to connect to.<br>    producer_instance_name = string<br><br>    # The name of the subnet where the internal IP address will be allocated.<br>    subnetwork_name = string<br><br>    # The name of the network where the forwarding rule will be created.<br>    network_name = string<br><br>    # Optional: The static internal IP address to use. If not provided,<br>    # Google Cloud will automatically allocate an IP address.<br>    ip_address_literal = string<br>    allow_psc_global_access      = optional(bool, false)<br>    labels                       = optional(map(string), {})<br>  }))</pre> | n/a | yes |
+| <a name="input_psc_endpoints"></a> [psc\_endpoints](#input\_psc\_endpoints) | List of PSC Endpoint configurations | <pre>list(object({<br>    # The Google Cloud project ID where the forwarding rule and address will be created.<br>    endpoint_project_id = string<br><br>    # The Google Cloud project ID where the Cloud SQL instance is located.<br>    producer_instance_project_id = string<br><br>    # The name of the subnet where the internal IP address will be allocated.<br>    subnetwork_name = string<br><br>    # The name of the network where the forwarding rule will be created.<br>    network_name = string<br><br>    # Optional: The static internal IP address to use. If not provided,<br>    # Google Cloud will automatically allocate an IP address.<br>    ip_address_literal = optional(string, "")<br>    # Allow access to the PSC endpoint from any region.<br>    allow_psc_global_access = optional(bool, false)<br>    # Resource labels to apply to the forwarding rule.<br>    labels = optional(map(string), {})<br><br>    # Either producer_instance_name OR target must be specified, but not both<br>    producer_instance_name = optional(string)<br>    target                 = optional(string)<br>  }))</pre> | n/a | yes |
 
 ## Outputs
 
 | Name | Description |
 |------|-------------|
 | <a name="output_forwarding_rule_self_link"></a> [forwarding\_rule\_self\_link](#output\_forwarding\_rule\_self\_link) | Map of forwarding rule self-links, keyed by SQL instance name |
+| <a name="output_forwarding_rule_target"></a> [forwarding\_rule\_target](#output\_forwarding\_rule\_target) | Map of forwarding rule targets, keyed by endpoint index |
 | <a name="output_ip_address_literal"></a> [ip\_address\_literal](#output\_ip\_address\_literal) | Map of IP addresses, keyed by SQL instance name |
 <!-- END_TF_DOCS -->
