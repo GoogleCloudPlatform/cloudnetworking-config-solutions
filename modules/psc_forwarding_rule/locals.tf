@@ -15,5 +15,15 @@
 # Construct the full service attachment name for each endpoint, using the project, region, and connection name.
 
 locals {
-  service_attachment_name = { for k, v in var.psc_endpoints : k => "projects/${v.producer_instance_project_id}/regions/${data.google_sql_database_instance.instance[k].region}/serviceAttachments/${data.google_sql_database_instance.instance[k].connection_name}" }
+  service_attachment_name = {
+    for k, v in var.psc_endpoints :
+    k => v.producer_instance_name != null ?
+    "projects/${v.producer_instance_project_id}/regions/${data.google_sql_database_instance.instance[k].region}/serviceAttachments/${data.google_sql_database_instance.instance[k].connection_name}" :
+    null
+  }
+  forwarding_rule_targets = { for k, v in var.psc_endpoints :
+    k => v.producer_instance_name != null ?
+    try(data.google_sql_database_instance.instance[k].psc_service_attachment_link, null) :
+    v.target
+  }
 }

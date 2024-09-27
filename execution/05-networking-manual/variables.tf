@@ -18,14 +18,11 @@
 variable "psc_endpoints" {
   description = "List of PSC Endpoint configurations"
   type = list(object({
-    # The Google Cloud project ID where the Cloud SQL instance is located.
-    producer_instance_project_id = string
-
     # The Google Cloud project ID where the forwarding rule and address will be created.
     endpoint_project_id = string
 
-    # The name of the Cloud SQL instance to connect to.
-    producer_instance_name = string
+    # The Google Cloud project ID where the Cloud SQL instance is located.
+    producer_instance_project_id = string
 
     # The name of the subnet where the internal IP address will be allocated.
     subnetwork_name = string
@@ -40,5 +37,16 @@ variable "psc_endpoints" {
     allow_psc_global_access = optional(bool, false)
     # Resource labels to apply to the forwarding rule.
     labels = optional(map(string), {})
+
+    # Either producer_instance_name OR target must be specified, but not both
+    producer_instance_name = optional(string)
+    target                 = optional(string)
   }))
+  validation {
+    condition = alltrue([
+      for config in var.psc_endpoints :
+      (config.producer_instance_name != null && config.target == null) || (config.producer_instance_name == null && config.target != null)
+    ])
+    error_message = "Exactly one of 'producer_instance_name' or 'target' must be specified for each PSC endpoint."
+  }
 }

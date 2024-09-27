@@ -29,3 +29,8 @@ output "ip_address_literal" {
   value       = module.psc_forwarding_rules.ip_address_literal
   description = "Map of IP addresses, keyed by SQL instance name"
 }
+
+output "forwarding_rule_target" {
+  value       = module.psc_forwarding_rules.forwarding_rule_target
+  description = "Map of forwarding rule targets, keyed by endpoint index"
+}
