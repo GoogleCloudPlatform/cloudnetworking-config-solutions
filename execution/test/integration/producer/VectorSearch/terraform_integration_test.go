@@ -62,9 +62,13 @@ performs verification on successfull creation of the vector search resources.
 func TestCreateVectorSearch(t *testing.T) {
 	// Initialize a Vector Search config YAML file to be tested.
 	createConfigYAML(t)
-	sourceFile := "provider.tf"
-	destinationFile := terraformDirectoryPath + "/test-provider.tf"
-	defer os.Remove(destinationFile)
+
+	// provider.tf already exists in the test pipeline and the following code will not be required.
+	if os.Getenv("ENTER_TF_PRODUCER_VECTOR_SEARCH_PREFIX") == "" {
+		sourceFile := "provider.tf"
+		destinationFile := terraformDirectoryPath + "/test-provider.tf"
+		defer os.Remove(destinationFile)
+
 
 	source, err := os.Open(sourceFile)
 	if err != nil {
@@ -82,7 +86,7 @@ func TestCreateVectorSearch(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-
+	}
 	var (
 		tfVars = map[string]any{
 			"config_folder_path": configFolderPath,
@@ -98,7 +102,7 @@ func TestCreateVectorSearch(t *testing.T) {
 		SetVarsAfterVarFiles: true,
 	})
 	// Create VPC outside of the terraform module.
-	err = createVPC(t, projectID, networkName)
+	err := createVPC(t, projectID, networkName)
 	if err != nil {
 		t.Error(err)
 	}

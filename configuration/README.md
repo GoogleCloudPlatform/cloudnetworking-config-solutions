@@ -25,6 +25,18 @@ This directory serves as a centralized repository for all Terraform configuratio
       - sql.tfvars
       - config
         - instance.yaml.example
+    - GKE
+      - gke.tfvars
+      - config
+        - instance.yaml.example
+    - Vector Search
+      - vectorsearch.tfvars
+      - config
+        - instance.yaml.example
+    - Vertex-AI-Online-Endpoints
+      - vertex-ai-online-endpoints.tfvars
+      - config
+        - endpoint.yaml.example
 - 05-networking-manual stage (networking-manual.tfvars)
 - 06-consumer stage
   - GCE
@@ -40,7 +52,7 @@ This directory serves as a centralized repository for all Terraform configuratio
       - cloudrunservice.tfvars
       - config
           - instance.yaml.example
-    
+
 
 # Usage
 
@@ -158,6 +170,8 @@ tunnel_2_router_bgp_session_range = ""
 tunnel_2_bgp_peer_asn             = 64514
 tunnel_2_bgp_peer_ip_address      = ""
 tunnel_2_shared_secret            = ""
+
+create_interconnect = false
 ```
 
 ## 03-security
@@ -220,7 +234,7 @@ psc_endpoints = [
 
 ## 06-consumer
 
-Consumer specific configuration examples can be found under the `/config` folder of that specific consumer. Such as for GCE, the example would be in the folder `configuration/consumer/GCE/config/instance1.yaml.example`.
+Consumer specific configuration examples can be found under the `/config` folder of that specific consumer. Such as for GCE, the example would be in the folder `configuration/consumer/GCE/config/instance.yaml.example`.
 
 ## Considerations
 
