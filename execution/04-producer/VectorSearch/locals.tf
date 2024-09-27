@@ -20,7 +20,7 @@ locals {
       project_id                     = instance.project_id
       index_display_name             = instance.index_display_name
       region                         = instance.region
-      index_endpoint_network         = instance.index_endpoint_network
+      index_endpoint_network         = try(instance.index_endpoint_network, var.index_endpoint_network)
       index_endpoint_display_name    = instance.index_endpoint_display_name
       deployed_index_id              = instance.deployed_index_id
       index_labels                   = try(instance.index_labels, var.index_labels)

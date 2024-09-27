@@ -63,6 +63,7 @@ variable "index_endpoint_labels" {
 variable "index_endpoint_network" {
   type        = string
   description = "The full name of the Google Compute Engine network to which the index endpoint should be peered. Private services access must already be configured for the network. If left unspecified, the index endpoint is not peered with any network. Format: projects/{project}/global/networks/{network}. Where {project} is a project number, as in 12345, and {network} is network name."
+  default     = null
 }
 
 variable "contents_delta_uri" {
