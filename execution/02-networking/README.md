@@ -209,7 +209,6 @@ terraform apply -var-file=../configuration/networking.tfvars
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| <a name="input_interconnect_project_id"></a> [interconnect\_project\_id](#input\_interconnect\_project\_id) | The ID of the project in which the resource(physical connection at colocation facilitity) belongs. | `string` | n/a | yes |
 | <a name="input_network_name"></a> [network\_name](#input\_network\_name) | Name of the VPC network to be created if var.create\_network is marked as true or Name of the already existing network if var.create\_network is false. | `string` | n/a | yes |
 | <a name="input_project_id"></a> [project\_id](#input\_project\_id) | The project ID of the Google Cloud project where the VPC will be created. | `string` | n/a | yes |
 | <a name="input_region"></a> [region](#input\_region) | Name of a Google Cloud region. | `string` | n/a | yes |
@@ -245,8 +244,9 @@ terraform apply -var-file=../configuration/networking.tfvars
 | <a name="input_ic_router_advertise_groups"></a> [ic\_router\_advertise\_groups](#input\_ic\_router\_advertise\_groups) | User-specified list of prefix groups to advertise in custom mode. This field can only be populated if advertiseMode is CUSTOM and is advertised to all peers of the router. | `list(string)` | <pre>[<br>  "ALL_SUBNETS"<br>]</pre> | no |
 | <a name="input_ic_router_advertise_mode"></a> [ic\_router\_advertise\_mode](#input\_ic\_router\_advertise\_mode) | User-specified flag to indicate which mode to use for advertisement. Default value is DEFAULT. Possible values are: DEFAULT, CUSTOM | `string` | `"CUSTOM"` | no |
 | <a name="input_ic_router_bgp_asn"></a> [ic\_router\_bgp\_asn](#input\_ic\_router\_bgp\_asn) | Local BGP Autonomous System Number (ASN). Must be an RFC6996 private ASN, either 16-bit or 32-bit. The value will be fixed for this router resource. | `string` | `""` | no |
-| <a name="input_ic_router_name"></a> [ic\_router\_name](#input\_ic\_router\_name) | Name of the interconnect router. | `string` | `""` | no |
+| <a name="input_ic_router_name"></a> [ic\_router\_name](#input\_ic\_router\_name) | Name of the interconnect router. | `string` | `"interconnect-router"` | no |
 | <a name="input_import_custom_routes"></a> [import\_custom\_routes](#input\_import\_custom\_routes) | Whether to import the custom routes to the peer network. | `bool` | `true` | no |
+| <a name="input_interconnect_project_id"></a> [interconnect\_project\_id](#input\_interconnect\_project\_id) | The ID of the project in which the resource(physical connection at colocation facilitity) belongs. | `string` | `""` | no |
 | <a name="input_nat_name"></a> [nat\_name](#input\_nat\_name) | Name of the Cloud NAT to be created. | `string` | `"internet-gateway"` | no |
 | <a name="input_next_hop_gateway"></a> [next\_hop\_gateway](#input\_next\_hop\_gateway) | URL to a gateway that should handle matching packets. Currently, you can only specify the internet gateway, using a full or partial valid URL. | `string` | `"default-internet-gateway"` | no |
 | <a name="input_peer_gateways"></a> [peer\_gateways](#input\_peer\_gateways) | Configuration of the (external or GCP) peer gateway. | <pre>map(object({<br>    external = optional(object({<br>      redundancy_type = string<br>      interfaces      = list(string)<br>      description     = optional(string, "Terraform managed external VPN gateway")<br>    }))<br>    gcp = optional(string)<br>  }))</pre> | `{}` | no |

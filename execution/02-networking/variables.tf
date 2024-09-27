@@ -303,6 +303,7 @@ variable "service_class" {
 variable "interconnect_project_id" {
   description = "The ID of the project in which the resource(physical connection at colocation facilitity) belongs."
   type        = string
+  default     = ""
 }
 
 variable "first_interconnect_name" {
@@ -446,6 +447,3 @@ variable "admin_enabled" {
   type        = bool
   default     = true
 }
-
-
-
