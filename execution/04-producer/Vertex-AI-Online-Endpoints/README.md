@@ -65,7 +65,7 @@ region: us-central1
 labels:
   environment: production
   team: ml-engineering 
-network: projects/your-gcp-project-id/global/networks/your-vpc-network
+network: projects/your-gcp-project-number/global/networks/your-vpc-network
 ```
 
 **NOTE** : Network mentioned here should have a service networking peering connection.
