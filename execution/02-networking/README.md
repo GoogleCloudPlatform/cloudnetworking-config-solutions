@@ -69,6 +69,10 @@ Key features of this configuration include:
 
 - `variables`.tf: Defines input variables for customizing the network configuration.
 
+**NOTE** : 
+
+If you're creating Subnet secondary IP address range for Pods and Services for GKE cluster as a producer please refer to the official documentation for [Pods](https://cloud.google.com/kubernetes-engine/docs/concepts/alias-ips#cluster_sizing_secondary_range_pods) and [Services](https://cloud.google.com/kubernetes-engine/docs/concepts/alias-ips#cluster_sizing_secondary_range_pods).
+
 ## Configuration
 
 To configure networking.tfvars for your environment, here's an example which can be used for your reference :

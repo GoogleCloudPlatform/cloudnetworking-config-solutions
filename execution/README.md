@@ -96,7 +96,6 @@ Each stage is designed to be managed independently by different teams of adminis
 
 If you skip the `00-bootstrap` stage, ensure the user executing the specific stage has the required IAM permissions to create the resources defined in that stage.
 
-
 ## Additional Components
 
 - **modules:** Contains custom Terraform modules for reusable infrastructure patterns.
@@ -134,8 +133,6 @@ If you skip the `00-bootstrap` stage, ensure the user executing the specific sta
         ```bash
         ./run.sh --help
         ```
-
-
 
 ## Important Notes:
 

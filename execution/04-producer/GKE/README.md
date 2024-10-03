@@ -73,8 +73,8 @@ network: your-vpc-network
 subnetwork: your-subnet
 description: "Production GKE cluster"
 kubernetes_version: 1.27
-ip_range_pods: 10.10.0.0/16
-ip_range_services: 10.20.0.0/20
+ip_range_pods: pod-range-name
+ip_range_services: services-range-name
 node_pools:
   - name: pool-1
     machine_type: n1-standard-2
@@ -88,7 +88,10 @@ enable_private_nodes: true
 master_ipv4_cidr_block: 172.16.0.0/28
 ```
 
-**NOTE** : The GKE version chosen would be resposible for the type of control plane connectivity. For reference, check GKE [release notes](https://cloud.google.com/kubernetes-engine/docs/release-notes-new-features).
+**NOTE** : 
+
+1. The GKE version chosen would be resposible for the type of control plane connectivity. For reference, check GKE [release notes](https://cloud.google.com/kubernetes-engine/docs/release-notes-new-features).
+2. If you're creating Subnet secondary IP address range for Pods and Services for GKE cluster as a producer please refer to the official documentation for [Pods](https://cloud.google.com/kubernetes-engine/docs/concepts/alias-ips#cluster_sizing_secondary_range_pods) and [Services](https://cloud.google.com/kubernetes-engine/docs/concepts/alias-ips#cluster_sizing_secondary_range_pods).
 
 ## Important Notes:
 
