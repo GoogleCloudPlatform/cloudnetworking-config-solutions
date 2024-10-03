@@ -2,7 +2,7 @@
 
 ## Overview
 
-This Consumer stage is responsible for provisioning consumer service instances such as Google Compute Engine (GCE) virtual machines. It uses Terraform modules to manage the creation and configuration of consumers such as VMs based on input parameters defined in YAML files.
+This Consumer stage is responsible for provisioning consumer service instances such as Google Compute Engine (GCE) virtual machines and Cloud Run Jobs & Cloud Run Services. It uses Terraform modules to manage the creation and configuration of consumers such as VMs based on input parameters defined in YAML files.
 
 The stage is designed to be highly flexible. For GCE, it allows customizations such as instance type, boot disk, network configuration, and attached storage.
 
@@ -19,11 +19,13 @@ The stage is designed to be highly flexible. For GCE, it allows customizations s
 - Enable the following APIs :
 
     - [Compute Engine API](https://cloud.google.com/compute/docs/reference/rest/v1): Used for creating and managing GCE VMs.
+    - [Cloud Run API](https://cloud.google.com/run/docs/reference/rest): Used for creating and managing cloud run jobs and cloud run services.
 
 - Permissions required :
 
     - [Compute Admin role](https://cloud.google.com/compute/docs/access/iam#compute.admin) : Used to create and manage GCE VMs.
     - [Service Account User](https://cloud.google.com/compute/docs/access/iam#iam.serviceAccountUser) : Lets a principal attach a service account to a resource.
+    - [Cloud Run Admin](https://cloud.google.com/run/docs/reference/iam/roles#run.admin) : User to create and manage cloud run jobs and cloud run services.
 
 ## Configuration
 
@@ -36,6 +38,13 @@ The stage is designed to be highly flexible. For GCE, it allows customizations s
 Configurations would be different for different consumer services as listed below :
 
 1. GCE : For configuration of the GCE VM, you can read more in the [GCE README]((cloudnetworking-config-solution/execution/06-consumer/GCE/README.md)).
+
+2. Cloud Run : For configuration of the Cloud Run Job and Service, you can read more in the following Sections.
+
+    2.1. [Cloud Run Job README]((cloudnetworking-config-solution/execution/06-consumer/CloudRun/Job/README.md)).
+
+
+    2.2. [Cloud Run Service README]((cloudnetworking-config-solution/execution/06-consumer/CloudRun/Service/README.md)).
 
 For every consumer, you can define .yaml files for the consumer configuration. With every .yaml file in the configs/ folder, our terraform module would create an instance. For an example, for GCE an example yaml files to create two instances are :
 
