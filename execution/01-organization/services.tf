@@ -15,7 +15,7 @@
 module "activate_project_apis" {
   for_each                    = var.activate_api_identities
   source                      = "terraform-google-modules/project-factory/google//modules/project_services"
-  version                     = "15.0.1"
+  version                     = "17.0.0"
   project_id                  = each.value.project_id
   activate_apis               = each.value.activate_apis
   disable_dependent_services  = each.value.disable_dependent_services
