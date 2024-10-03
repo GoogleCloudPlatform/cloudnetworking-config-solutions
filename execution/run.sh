@@ -23,7 +23,7 @@ GREEN='\033[0;32m'
 NC='\033[0m'
 
 # Define valid stages to be accespted by the -s flag
-valid_stages="all organization networking security/alloydb security/mrc security/cloudsql security/gce producer/alloydb producer/mrc producer/cloudsql networking-manual consumer/gce"
+valid_stages="all organization networking security/alloydb security/mrc security/cloudsql security/gce producer/alloydb producer/mrc producer/cloudsql producer/gke producer/vectorsearch producer/onlineendpoint networking-manual consumer/gce consumer/cloudrun/job consumer/cloudrun/service"
 
 # Define valid Terraform commands to be accepted by the -tf or --tfcommand flag
 valid_tf_commands="init apply apply-auto-approve destroy destroy-auto-approve init-apply init-apply-auto-approve"
@@ -39,8 +39,13 @@ stage_path_map=(
     "producer/alloydb=04-producer/AlloyDB"
     "producer/mrc=04-producer/MRC"
     "producer/cloudsql=04-producer/CloudSQL"
+    "producer/gke=04-producer/GKE"
+    "producer/vectorsearch=04-producer/VectorSearch"
+    "producer/onlineendpoint=04-producer/Vertex-AI-Online-Endpoints"
     "networking-manual=05-networking-manual"
     "consumer/gce=06-consumer/GCE"
+    "consumer/cloudrun/job=06-consumer/CloudRun/Job"
+    "consumer/cloudrun/service=06-consumer/CloudRun/Service"
 )
 
 # Define tfvars to stage path mapping (excluding "all")
@@ -54,8 +59,13 @@ stagewise_tfvar_path_map=(
     "04-producer/AlloyDB=../../../configuration/producer/AlloyDB/alloydb.tfvars"
     "04-producer/MRC=../../../configuration/producer/MRC/mrc.tfvars"
     "04-producer/CloudSQL=../../../configuration/producer/CloudSQL/cloudsql.tfvars"
+    "04-producer/GKE=../../../configuration/producer/GKE/gke.tfvars"
+    "04-producer/VectorSearch=../../../configuration/producer/VectorSearch/vectorsearch.tfvars"
+    "04-producer/Vertex-AI-Online-Endpoints=../../../configuration/producer/Vertex-AI-Online-Endpoints/vertex-ai-online-endpoints.tfvars"
     "05-networking-manual=../../configuration/networking-manual.tfvars"
     "06-consumer/GCE=../../../configuration/consumer/GCE/gce.tfvars"
+    "06-consumer/CloudRun/Job=../../../../configuration/consumer/CloudRun/Job/cloudrunjob.tfvars"
+    "06-consumer/CloudRun/Service=../../../../configuration/consumer/CloudRun/Service/cloudrunservice.tfvars"
 )
 
 # Define stage to description mapping (excluding "all")
@@ -70,8 +80,13 @@ stage_wise_description_map=(
   "producer/alloydb=Executes 04-producer/AlloyDB stage, manages AlloyDB instance."
   "producer/mrc=Executes 04-producer/MRC stage, manages MRC instance."
   "producer/cloudsql=Executes 04-producer/CloudSQL stage, manages CloudSQL instance."
+  "producer/gke=Executes 04-producer/GKE stage, manages GKE clusters."
+  "producer/vectorsearch=Executes 04-producer/VectorSearch stage, manages Vector Search instances."
+  "producer/onlineendpoint=Executes 04-producer/Vertex-AI-Online-Endpoints stage, manages Online endpoints."
   "networking-manual=Executes 05-networking-manual stage, manages PSC for supported services."
   "consumer/gce=Executes 06-consumer/GCE stage, manages GCE instance."
+  "consumer/cloudrun/job=Executes 06-consumer/CloudRun/Job, manages Cloud Run jobs."
+  "consumer/cloudrun/service=Executes 06-consumer/CloudRun/Service, manages Cloud Run services."
   )
 
 # Define tfcommand to description mapping.

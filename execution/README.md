@@ -78,7 +78,7 @@ The deployment is divided into seven logically isolated stages, each handled by 
 
 5. **04-producer:**
    - Deploys GCP-managed producer services.
-   - Includes AlloyDB, Cloud SQL, Memorystore Redis clusters.
+   - Includes AlloyDB, Cloud SQL, Memorystore Redis clusters, GKE, Vertex AI Vector Search, Vertex AI Online Prediction Endpoint.
 
 6. **05-networking-manual:**
    - This stage establishes Private Service Connect (PSC) for secure, private communication between your consumer project and the producer services created in the "04-producer" stage.
@@ -88,14 +88,13 @@ The deployment is divided into seven logically isolated stages, each handled by 
 
 7. **06-consumer:**
    - Deploys GCP-managed consumer services.
-   - Includes GCE instances.
+   - Includes GCE instances and Cloud Run.
 
 ## Logical Isolation and Permissions
 
 Each stage is designed to be managed independently by different teams of administrators. This provides granular control and security.  The specific IAM permissions required for each stage are detailed in the `README.md` files within their respective folders.
 
 If you skip the `00-bootstrap` stage, ensure the user executing the specific stage has the required IAM permissions to create the resources defined in that stage.
-
 
 ## Additional Components
 
@@ -135,11 +134,8 @@ If you skip the `00-bootstrap` stage, ensure the user executing the specific sta
         ./run.sh --help
         ```
 
-
-
 ## Important Notes:
 
 - Refer to the `README.md` files in each stage subfolder for detailed instructions and information specific to that stage's deployment.
 - Carefully verify the terraform plan to ensure the desired changes in infrastructure matches the expectations.
 - Review and understand the security implications before deploying any of the infrastructure components.
-

@@ -4,4 +4,4 @@ display_name : <endpoint-display-name>
 description  : <endpoint-description-name>
 location     : <endpoint-location>
 region       : <endpoint-region>
-network      : <endpoint-vpc> # In format : projects/<project-id>/global/networks/<endpoint1-vpc-name>
+network      : <endpoint-vpc> # In format : projects/<project-number>/global/networks/<endpoint1-vpc-name>
