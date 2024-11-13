@@ -96,3 +96,20 @@ variable "config_folder_path" {
   type        = string
   default     = "../../../configuration/producer/AlloyDB/config"
 }
+variable "endpoint_project_id" {
+  description = "The project ID of the endpoint consumer."
+  type        = string
+  default     = null
+}
+
+variable "psc_enabled" {
+  type        = bool
+  description = "Whether Private Service Connectivity (PSC) is enabled."
+  default     = false
+}
+
+variable "psc_allowed_consumer_projects" {
+  type        = list(string)
+  description = "List of allowed consumer projects for PSC."
+  default     = []
+}

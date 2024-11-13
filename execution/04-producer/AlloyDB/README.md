@@ -99,49 +99,54 @@ This minimal example includes only the essential fields required to create a bas
 This comprehensive example showcases all available fields, allowing you to customize your AlloyDB instance with advanced settings for performance, availability and network configuration.
 
   ```
-  project_id: <Project-ID>
-  cluster_id: cn-alloydb-cid
-  cluster_display_name: cn-alloydb-cid
-  region: us-central1
-  network_id: projects/<Project-ID>/global/networks/<Network-Name>
-  allocated_ip_range: psarange
-  database_version: POSTGRES_15
-  primary_instance:
-    instance_id : cn-alloydb-id
-    display_name : cn-alloydb-id
-    instance_type : PRIMARY
-    machine_cpu_count : 2
-    database_flags : null
-  cluster_labels:
+project_id: <Project-ID>
+cluster_id: cn-alloydb-cid
+cluster_display_name: cn-alloydb-cid
+region: us-central1
+network_id: projects/<Project-ID>/global/networks/<Network-Name>
+allocated_ip_range: psarange
+psc_enabled: true
+psc_allowed_consumer_projects:
+  - <Consumer-Project-ID-1>
+  - <Consumer-Project-ID-2>
+database_version: POSTGRES_15
+primary_instance:
+  instance_id: cn-alloydb-id
+  display_name: cn-alloydb-id
+  instance_type: PRIMARY
+  machine_cpu_count: 2
+  database_flags: null
+cluster_labels:
+  environment: development
+cluster_initial_user:
+  user: admin
+  password: admin
+read_pool_instance:
+  - instance_id: read-instance-1
+    display_name: read-instance-1
+    node_count: 1
+    database_flags: null
+    availability_type: ZONAL
+    gce_zone: us-central1-a
+    machine_cpu_count: 2
+    ssl_mode: ALLOW_UNENCRYPTED_AND_ENCRYPTED
+    require_connectors: false
+automated_backup_policy:
+  location: us-central1
+  backup_window: 1800s
+  enabled: true
+  weekly_schedule:
+    days_of_week:
+      - MONDAY
+    start_times:
+      - 2:00:00:00
+  quantity_based_retention_count: 1
+  time_based_retention_count: null
+  labels:
     environment: development
-  cluster_initial_user:
-    user: admin
-    password: admin
-  read_pool_instance :
-    - instance_id: read-instance-1
-      display_name: read-instance-1
-      node_count: 1
-      database_flags: null
-      availability_type: ZONAL
-      gce_zone: us-central1-a
-      machine_cpu_count: 2
-      ssl_mode: ALLOW_UNENCRYPTED_AND_ENCRYPTED
-      require_connectors: false
-  automated_backup_policy :
-    location: us-central1
-    backup_window:  1800s
-    enabled: true
-    weekly_schedule:
-      days_of_week:
-        - MONDAY
-      start_times:
-        - 2:00:00:00
-    quantity_based_retention_count: 1
-    time_based_retention_count: null
-    labels:
-      environment: development
-    backup_encryption_key_name: null
-  cluster_encryption_key_name: null
+  backup_encryption_key_name: null
+cluster_encryption_key_name: null
+
   ```
 
 ## Important Notes:
@@ -157,33 +162,35 @@ Refer to the official Google Cloud AlloyDB documentation for the most up-to-date
 
 ## Modules
 
+## Modules
+
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_alloy_db"></a> [alloy\_db](#module\_alloy\_db) | GoogleCloudPlatform/alloy-db/google | ~> 2.2.0 |
-
+| <a name="module_alloydb_central"></a> [alloydb\_central](#module\_alloydb\_central) | GoogleCloudPlatform/alloy-db/google | ~> 3.0 |
 
 ## Inputs
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-|project_id | The ID of the Google Cloud project where you want to create your AlloyDB instance. | `string` | n/a | yes |
-|cluster_id | A unique identifier for your AlloyDB cluster. It must contain only lowercase letters, numbers, and hyphens. | `string` | n/a | yes |
-|cluster_display_name_id | A human-readable name for your cluster that will be displayed in the Google Cloud Console. | `string` | n/a | yes |
-|region | The Google Cloud region where your AlloyDB cluster will be located. | `string` | n/a | yes |
-|network\_id | The Network ID of the VPC network where your AlloyDB instance will be deployed. | `string` | n/a | yes |
-|primary_instance| This section configures the primary instance of your AlloyDB cluster, responsible for handling read and write operations. | <pre>object({<br>    instance_id        = string,<br>    display_name       = optional(string),<br>    database_flags     = optional(map(string))<br>    labels             = optional(map(string))<br>    annotations        = optional(map(string))<br>    gce_zone           = optional(string)<br>    availability_type  = optional(string)<br>    machine_cpu_count  = optional(number, 2)<br>    ssl_mode           = optional(string)<br>    require_connectors = optional(bool)<br>    query_insights_config = optional(object({<br>      query_string_length     = optional(number)<br>      record_application_tags = optional(bool)<br>      record_client_address   = optional(bool)<br>      query_plans_per_minute  = optional(number)<br>    }))<br>  })</pre>| n/a | yes
+| <a name="input_project_id"></a> [project\_id](#input\_project\_id) | The ID of the Google Cloud project where you want to create your AlloyDB instance. | `string` | n/a | yes |
+| <a name="input_cluster_id"></a> [cluster\_id](#input\_cluster\_id) | A unique identifier for your AlloyDB cluster. It must contain only lowercase letters, numbers, and hyphens. | `string` | n/a | yes |
+| <a name="input_cluster_display_name"></a> [cluster\_display\_name](#input\_cluster\_display\_name) | A human-readable name for your cluster that will be displayed in the Google Cloud Console. | `string` | n/a | yes |
+| <a name="input_region"></a> [region](#input\_region) | The Google Cloud region where your AlloyDB cluster will be located. | `string` | n/a | yes |
+| <a name="input_network_id"></a> [network\_id](#input\_network\_id) | The Network ID of the VPC network where your AlloyDB instance will be deployed. | `string` | n/a | yes |
+| <a name="input_primary_instance"></a> [primary\_instance](#input\_primary\_instance) | This section configures the primary instance of your AlloyDB cluster, responsible for handling read and write operations. | <pre>object({<br>    instance_id        = string,<br>    display_name       = optional(string),<br>    database_flags     = optional(map(string)),<br>    labels             = optional(map(string)),<br>    annotations        = optional(map(string)),<br>    gce_zone           = optional(string),<br>    availability_type  = optional(string),<br>    machine_cpu_count  = optional(number, 2),<br>    ssl_mode           = optional(string),<br>    require_connectors = optional(bool),<br>    query_insights_config = optional(object({<br>      query_string_length     = optional(number),<br>      record_application_tags = optional(bool),<br>      record_client_address   = optional(bool),<br>      query_plans_per_minute  = optional(number)<br>    }))<br>  })</pre> | n/a | yes |
 | <a name="input_allocated_ip_range"></a> [allocated\_ip\_range](#input\_allocated\_ip\_range) | The name of the allocated IP range for the private IP AlloyDB cluster. For example: google-managed-services-default. If set, the instance IPs for this cluster will be created in the allocated range. | `string` | `null` | no |
-| <a name="input_automated_backup_policy"></a> [automated\_backup\_policy](#input\_automated\_backup\_policy) | The automated backup policy for this cluster. If no policy is provided then the default policy will be used. The default policy takes one backup a day, has a backup window of 1 hour, and retains backups for 14 days. | <pre>object({<br>    location      = optional(string)<br>    backup_window = optional(string)<br>    enabled       = optional(bool)<br><br>    weekly_schedule = optional(object({<br>      days_of_week = optional(list(string))<br>      start_times  = list(string)<br>    })),<br><br>    quantity_based_retention_count = optional(number)<br>    time_based_retention_count     = optional(string)<br>    labels                         = optional(map(string))<br>    backup_encryption_key_name     = optional(string)<br>  })</pre> | `null` | no |
-| <a name="input_cluster_encryption_key_name"></a> [cluster\_encryption\_key\_name](#input\_cluster\_encryption\_key\_name) | The fully-qualified resource name of the KMS key for cluster encryption. Each Cloud KMS key is regionalized and has the following format: projects/[PROJECT]/locations/[REGION]/keyRings/[RING]/cryptoKeys/[KEY\_NAME] | `string` | `null` | no |
-| <a name="input_cluster_initial_user"></a> [cluster\_initial\_user](#input\_cluster\_initial\_user) | Alloy DB Cluster Initial User Credentials. | <pre>object({<br>    user     = optional(string),<br>    password = string<br>  })</pre> | `null` | no |
-| <a name="input_cluster_labels"></a> [cluster\_labels](#input\_cluster\_labels) | User-defined labels for the alloydb cluster. | `map(string)` | `{}` | no |
-| <a name="input_config_folder_path"></a> [config\_folder\_path](#input\_config\_folder\_path) | Location of YAML files holding AlloyDB configuration values. | `string` | `"config"` | no |
-| <a name="input_database_version"></a> [database\_version](#input\_database\_version) | The database engine major version. This is an optional field and it's populated at the Cluster creation time. This field cannot be changed after cluster creation. Possible valus: POSTGRES\_14, POSTGRES\_15 | `string` | `"POSTGRES_15"` | no |
-| <a name="input_read_pool_instance"></a> [read\_pool\_instance](#input\_read\_pool\_instance) | List of Read Pool Instances to be created. | <pre>list(object({<br>    instance_id        = string<br>    display_name       = string<br>    node_count         = optional(number, 1)<br>    database_flags     = optional(map(string))<br>    availability_type  = optional(string)<br>    gce_zone           = optional(string)<br>    machine_cpu_count  = optional(number, 2)<br>    ssl_mode           = optional(string)<br>    require_connectors = optional(bool)<br>    query_insights_config = optional(object({<br>      query_string_length     = optional(number)<br>      record_application_tags = optional(bool)<br>      record_client_address   = optional(bool)<br>      query_plans_per_minute  = optional(number)<br>    }))<br>  }))</pre> | `[]` | no |
+| <a name="input_psc_enabled"></a> [psc\_enabled](#input\_psc\_enabled) | Determines whether Private Service Connect (PSC) is enabled for this AlloyDB cluster. | `bool` | `false` | no |
+| <a name="input_psc_allowed_consumer_projects"></a> [psc\_allowed\_consumer\_projects](#input\_psc\_allowed\_consumer\_projects) | A list of allowed consumer projects for Private Service Connect. These projects will have access to the AlloyDB cluster through PSC. | `list(string)` | `[]` | no |
+| <a name="input_automated_backup_policy"></a> [automated\_backup\_policy](#input\_automated\_backup\_policy) | The automated backup policy for this cluster. If no policy is provided then the default policy will be used. The default policy takes one backup a day, has a backup window of 1 hour, and retains backups for 14 days. | <pre>object({<br>    location      = optional(string),<br>    backup_window = optional(string),<br>    enabled       = optional(bool),<br>    weekly_schedule = optional(object({<br>      days_of_week = optional(list(string)),<br>      start_times  = list(string)<br>    })),<br>    quantity_based_retention_count = optional(number),<br>    time_based_retention_count     = optional(string),<br>    labels                         = optional(map(string)),<br>    backup_encryption_key_name     = optional(string)<br>  })</pre> | `null` | no |
+| <a name="input_cluster_encryption_key_name"></a> [cluster\_encryption\_key\_name](#input\_cluster\_encryption\_key\_name) | The fully-qualified resource name of the KMS key for cluster encryption. Each Cloud KMS key is regionalized and has the following format: projects/[PROJECT]/locations/[REGION]/keyRings/[RING]/cryptoKeys/[KEY\_NAME]. | `string` | `null` | no |
+| <a name="input_cluster_initial_user"></a> [cluster\_initial\_user](#input\_cluster\_initial\_user) | AlloyDB cluster initial user credentials. | <pre>object({<br>    user     = optional(string),<br>    password = string<br>  })</pre> | `null` | no |
+| <a name="input_cluster_labels"></a> [cluster\_labels](#input\_cluster\_labels) | User-defined labels for the AlloyDB cluster. | `map(string)` | `{}` | no |
+| <a name="input_database_version"></a> [database\_version](#input\_database\_version) | The database engine major version. This is an optional field and it's populated at the Cluster creation time. This field cannot be changed after cluster creation. Possible values: POSTGRES\_14, POSTGRES\_15. | `string` | `"POSTGRES_15"` | no |
+| <a name="input_read_pool_instance"></a> [read\_pool\_instance](#input\_read\_pool\_instance) | List of Read Pool Instances to be created. | <pre>list(object({<br>    instance_id        = string,<br>    display_name       = string,<br>    node_count         = optional(number, 1),<br>    database_flags     = optional(map(string)),<br>    availability_type  = optional(string),<br>    gce_zone           = optional(string),<br>    machine_cpu_count  = optional(number, 2),<br>    ssl_mode           = optional(string),<br>    require_connectors = optional(bool),<br>    query_insights_config = optional(object({<br>      query_string_length     = optional(number),<br>      record_application_tags = optional(bool),<br>      record_client_address   = optional(bool),<br>      query_plans_per_minute  = optional(number)<br>    }))<br>  }))</pre> | `[]` | no |
 
 ## Outputs
 
 | Name | Description |
 |------|-------------|
-| <a name="output_cluster_details"></a> [cluster\_details](#output\_cluster\_details) | Display cluster name and details like cluster id, network configuration and state of the AlloyDB cluster created. |
+| <a name="output_cluster_details"></a> [cluster\_details](#output\_cluster\_details) | Displays cluster name and details such as cluster ID, network configuration, and the state of the AlloyDB cluster created. |
 <!-- END_TF_DOCS -->

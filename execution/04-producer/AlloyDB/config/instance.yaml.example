@@ -12,3 +12,6 @@ primary_instance:
   database_flags : null
 read_pool_instance : null
 automated_backup_policy : null
+psc_enabled: false
+psc_allowed_consumer_projects: [""]
+

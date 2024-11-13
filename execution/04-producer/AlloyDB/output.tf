@@ -15,11 +15,18 @@
  */
 
 output "cluster_details" {
-  description = "Display cluster name and details like cluster id, network configuration and state of the AlloyDB cluster created."
-  value = { for name, cluster in module.alloy_db :
-    name => {
-      "cluster_id" : cluster.cluster_id,
-      "network_config" : cluster.cluster.network_config,
-      "cluster_status" : cluster.cluster.state,
-  } }
+  description = "Details of each AlloyDB cluster instance."
+  value = {
+    for instance in local.instance_list :
+    instance.cluster_display_name => {
+      cluster_id                    = instance.cluster_id
+      cluster_display_name          = instance.cluster_display_name
+      database_version              = instance.database_version
+      network_id                    = instance.network_id
+      region                        = instance.region
+      allocated_ip_range            = try(instance.allocated_ip_range, "N/A")
+      psc_enabled                   = try(instance.psc_enabled, false)
+      psc_allowed_consumer_projects = try(instance.psc_allowed_consumer_projects, ["cncs-sridharshini-23", "pm-singleproject-30"])
+    }
+  }
 }

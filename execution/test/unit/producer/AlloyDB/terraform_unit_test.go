@@ -15,11 +15,12 @@ package unittest
 
 import (
 	compare "cmp"
+	"testing"
+
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
 	"github.com/gruntwork-io/terratest/modules/terraform"
 	"golang.org/x/exp/slices"
-	"testing"
 )
 
 const (
@@ -119,7 +120,7 @@ func TestResourcesCount(t *testing.T) {
 	})
 	planStruct := terraform.InitAndPlan(t, terraformOptions)
 	resourceCount := terraform.GetResourceCount(t, planStruct)
-	if got, want := resourceCount.Add, 2; got != want {
+	if got, want := resourceCount.Add, 3; got != want {
 		t.Errorf("Test Resource Count Add = %v, want = %v", got, want)
 	}
 	if got, want := resourceCount.Change, 0; got != want {
@@ -138,7 +139,7 @@ created by the terraform solution.
 func TestTerraformModuleResourceAddressListMatch(t *testing.T) {
 	// Construct the terraform options with default retryable errors to handle the most common
 	// retryable errors in terraform testing.
-	expectedModulesAddress := []string{"module.alloy_db[\"dummy\"]"}
+	expectedModulesAddress := []string{"module.alloy_db_central[\"dummy\"]"}
 	terraformOptions := terraform.WithDefaultRetryableErrors(t, &terraform.Options{
 		// Set the path to the Terraform code that will be tested.
 		TerraformDir: terraformDirectoryPath,

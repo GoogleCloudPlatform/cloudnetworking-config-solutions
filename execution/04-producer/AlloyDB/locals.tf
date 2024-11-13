@@ -14,7 +14,11 @@
 
 locals {
   config_folder_path = var.config_folder_path
-  instances          = [for file in fileset(local.config_folder_path, "[^_]*.yaml") : yamldecode(file("${local.config_folder_path}/${file}"))]
+
+  # Decode YAML configuration files and build the list of instances
+  instances = [for file in fileset(local.config_folder_path, "[^_]*.yaml") : yamldecode(file("${local.config_folder_path}/${file}"))]
+
+  # Instance list with PSC and network configuration fields
   instance_list = flatten([
     for instance in try(local.instances, []) : {
       cluster_id                  = instance.cluster_id
@@ -30,6 +34,22 @@ locals {
       read_pool_instance          = try(instance.read_pool_instance, var.read_pool_instance)
       automated_backup_policy     = try(instance.automated_backup_policy, var.automated_backup_policy)
       cluster_encryption_key_name = try(instance.cluster_encryption_key_name, var.cluster_encryption_key_name)
+
+      # PSC configuration fields
+      psc_enabled                   = try(instance.psc_enabled, var.psc_enabled)
+      psc_allowed_consumer_projects = try(instance.psc_allowed_consumer_projects, var.psc_allowed_consumer_projects)
     }
   ])
+
+  # Map for alloydb_network_config keyed by cluster_display_name
+  alloydb_network_config = {
+    for instance in local.instance_list :
+    instance.cluster_display_name => {
+      network_self_link = instance.psc_enabled ? null : instance.network_id
+      psc_config = instance.psc_enabled ? {
+        psc_enabled                   = false,
+        psc_allowed_consumer_projects = instance.psc_allowed_consumer_projects
+      } : null
+    }
+  }
 }

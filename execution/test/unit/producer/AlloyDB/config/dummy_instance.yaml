@@ -29,3 +29,6 @@ primary_instance:
 read_pool_instance : null
 automated_backup_policy : null
 deletion_protection: false
+psc_enabled: false
+psc_allowed_consumer_projects: ["854523102947"]
+

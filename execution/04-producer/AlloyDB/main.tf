@@ -12,21 +12,42 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-module "alloy_db" {
-  source                      = "GoogleCloudPlatform/alloy-db/google"
-  version                     = "~> 2.3.0"
-  for_each                    = { for alloydb in local.instance_list : alloydb.cluster_display_name => alloydb }
-  project_id                  = each.value.project_id
-  cluster_id                  = each.value.cluster_id
-  cluster_display_name        = each.value.cluster_display_name
-  cluster_location            = each.value.region
-  network_self_link           = each.value.network_id
-  allocated_ip_range          = each.value.allocated_ip_range
-  database_version            = each.value.database_version
-  cluster_labels              = each.value.cluster_labels
-  cluster_initial_user        = each.value.cluster_initial_user
-  primary_instance            = each.value.primary_instance
-  read_pool_instance          = each.value.read_pool_instance
+module "alloydb_central" {
+  source   = "GoogleCloudPlatform/alloy-db/google"
+  version  = "~> 3.0"
+  for_each = { for alloydb in local.instance_list : alloydb.cluster_display_name => alloydb }
+
+  project_id           = each.value.project_id
+  cluster_id           = each.value.cluster_id
+  cluster_display_name = each.value.cluster_display_name
+  cluster_location     = each.value.region
+  network_self_link    = local.alloydb_network_config[each.key].network_self_link
+  allocated_ip_range   = each.value.allocated_ip_range
+  database_version     = each.value.database_version
+  cluster_labels       = each.value.cluster_labels
+  cluster_initial_user = each.value.cluster_initial_user
+
+  primary_instance = {
+    instance_id        = "cluster-${each.value.region}-instance1-psc"
+    require_connectors = false
+    ssl_mode           = "ALLOW_UNENCRYPTED_AND_ENCRYPTED"
+  }
+
+  read_pool_instance = [
+    {
+      instance_id        = "cluster-${each.value.region}-r1-psc"
+      display_name       = "cluster-${each.value.region}-r1-psc"
+      require_connectors = false
+      ssl_mode           = "ALLOW_UNENCRYPTED_AND_ENCRYPTED"
+    }
+  ]
+
   automated_backup_policy     = each.value.automated_backup_policy
   cluster_encryption_key_name = each.value.cluster_encryption_key_name
+
+  # PSC configuration
+  psc_enabled                   = local.alloydb_network_config[each.key].psc_config != null
+  psc_allowed_consumer_projects = local.alloydb_network_config[each.key].psc_config != null ? local.alloydb_network_config[each.key].psc_config.psc_allowed_consumer_projects : null
 }
+
+

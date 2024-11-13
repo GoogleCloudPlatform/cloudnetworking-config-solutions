@@ -15,14 +15,17 @@ package integrationtest
 
 import (
 	"fmt"
+	"math/rand"
+	"os"
+	"reflect"
+	"strings"
+	"testing"
+	"time"
+
 	"github.com/gruntwork-io/terratest/modules/shell"
 	"github.com/gruntwork-io/terratest/modules/terraform"
 	"github.com/tidwall/gjson"
 	"gopkg.in/yaml.v2"
-	"math/rand"
-	"os"
-	"testing"
-	"time"
 )
 
 var (
@@ -43,13 +46,15 @@ type PrimaryInstanceStruct struct {
 }
 
 type AlloyDBStruct struct {
-	ClusterID          string                `yaml:"cluster_id"`
-	ClusterDisplayName string                `yaml:"cluster_display_name"`
-	ProjectID          string                `yaml:"project_id"`
-	Region             string                `yaml:"region"`
-	NetworkID          string                `yaml:"network_id"`
-	PrimaryInstance    PrimaryInstanceStruct `yaml:"primary_instance"`
-	AllocatedIPRange   string                `yaml:"allocated_ip_range"`
+	ClusterID                  string                `yaml:"cluster_id"`
+	ClusterDisplayName         string                `yaml:"cluster_display_name"`
+	ProjectID                  string                `yaml:"project_id"`
+	Region                     string                `yaml:"region"`
+	NetworkID                  string                `yaml:"network_id"`
+	PrimaryInstance            PrimaryInstanceStruct `yaml:"primary_instance"`
+	AllocatedIPRange           string                `yaml:"allocated_ip_range"`
+	PscEnabled                 bool                  `yaml:"psc_enabled"`
+	PscAllowedConsumerProjects []string              `yaml:"psc_allowed_consumer_projects"`
 }
 
 /*
@@ -127,6 +132,25 @@ func TestCreateAlloyDB(t *testing.T) {
 	got = gjson.Get(result.String(), clusterPSARangeNamePath).String()
 	if got != want {
 		t.Errorf("AlloyDB Cluster with invalid PSA Range Name = %v, want = %v", got, want)
+	}
+	t.Log(" ========= Verify PSC Enabled for AlloyDB Cluster ========= ")
+	wantPscEnabled := "true"
+	pscEnabledPath := fmt.Sprintf("%s.network_config.0.psc_enabled", clusterDisplayName)
+	gotPscEnabled := gjson.Get(result.String(), pscEnabledPath).String()
+	if gotPscEnabled != wantPscEnabled {
+		t.Errorf("AlloyDB Cluster PSC not enabled as expected. Got: %v, Want: %v", gotPscEnabled, wantPscEnabled)
+	}
+
+	t.Log(" ========= Verify PSC Allowed Consumer Projects ========= ")
+	wantConsumerProjects := []string{"854523102947", "854523102947"}
+	consumerProjectsPath := fmt.Sprintf("%s.network_config.0.psc_allowed_consumer_projects", clusterDisplayName)
+	gotConsumerProjects := gjson.Get(result.String(), consumerProjectsPath).Array()
+	var gotProjects []string
+	for _, project := range gotConsumerProjects {
+		gotProjects = append(gotProjects, project.String())
+	}
+	if !reflect.DeepEqual(gotProjects, wantConsumerProjects) {
+		t.Errorf("AlloyDB Cluster PSC consumer projects do not match. Got: %v, Want: %v", gotProjects, wantConsumerProjects)
 	}
 }
 
@@ -227,8 +251,14 @@ func createPSA(t *testing.T, projectID string, networkName string, rangeName str
 createConfigYAML is a helper function which creates the configigration YAML file
 for an alloydb instance range before the.
 */
+
 func createConfigYAML(t *testing.T) {
 	t.Log("========= YAML File =========")
+
+	// Define PSC variables
+	pscEnabled := true
+	allowedConsumerProjects := []string{"854523102947", "854523102947"}
+
 	instance1 := AlloyDBStruct{
 		ClusterID:          alloyDBClusterId,
 		ClusterDisplayName: clusterDisplayName,
@@ -238,17 +268,35 @@ func createConfigYAML(t *testing.T) {
 		PrimaryInstance: PrimaryInstanceStruct{
 			InstanceID: instanceID,
 		},
-		AllocatedIPRange: rangeName,
+		AllocatedIPRange:           rangeName,
+		PscEnabled:                 pscEnabled,
+		PscAllowedConsumerProjects: allowedConsumerProjects,
 	}
+
+	// Marshal without the inline list
 	yamlData, err := yaml.Marshal(&instance1)
 	if err != nil {
-		t.Errorf("Error while marshallaing %v", err)
+		t.Errorf("Error while marshaling %v", err)
 	}
-	filePath := fmt.Sprintf("%s/%s", "config", "instance1.yaml")
-	t.Logf("Created YAML config at %s with content:\n%s", filePath, string(yamlData))
 
-	err = os.WriteFile(filePath, []byte(yamlData), 0666)
+	// Convert the list to inline format
+	inlineList := fmt.Sprintf(`psc_allowed_consumer_projects: ["%s"]`, join(allowedConsumerProjects, `", "`))
+	yamlWithInlineList := append(yamlData, []byte("\n"+inlineList)...)
+
+	// Write to file
+	filePath := fmt.Sprintf("%s/%s", "config", "instance1.yaml")
+	t.Logf("Created YAML config at %s with content:\n%s", filePath, string(yamlWithInlineList))
+
+	err = os.WriteFile(filePath, yamlWithInlineList, 0666)
 	if err != nil {
 		t.Errorf("Unable to write data into the file %v", err)
 	}
+}
+
+// Helper function to join strings with separator
+func join(elements []string, sep string) string {
+	if len(elements) == 0 {
+		return ""
+	}
+	return elements[0] + sep + strings.Join(elements[1:], sep)
 }
