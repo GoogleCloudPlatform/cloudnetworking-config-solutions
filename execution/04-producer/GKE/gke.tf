@@ -15,7 +15,7 @@
 module "gke" {
   for_each = local.cluster_map
   source   = "terraform-google-modules/kubernetes-engine/google//modules/private-cluster"
-  version  = "33.0.4"
+  version  = "35.0.1"
 
   kubernetes_version = each.value.kubernetes_version
 
