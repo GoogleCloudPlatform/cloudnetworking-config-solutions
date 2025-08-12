@@ -1,0 +1,80 @@
+# Copyright 2025 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+
+steps:
+- id: 'deploy-ssl-nlb-passthrough'
+  name: 'gcr.io/google.com/cloudsdktool/cloud-sdk:latest'
+  entrypoint: /bin/bash
+  args:
+   - '-c'
+   - |
+        set -e # Fail on any error
+        apt-get update -y && apt-get install -y unzip git wget # Ensure tools are present
+
+        TERRAFORM_VERSION="1.11.4"
+        echo "Downloading Terraform v$${TERRAFORM_VERSION}..."
+        wget https://releases.hashicorp.com/terraform/$${TERRAFORM_VERSION}/terraform_$${TERRAFORM_VERSION}_linux_amd64.zip
+        unzip terraform_$${TERRAFORM_VERSION}_linux_amd64.zip
+        mv terraform /usr/local/bin/
+        terraform version
+
+        # Navigate to the execution directory where run.sh is located
+        cd execution
+
+        # The 00-bootstrap stage is crucial. Ensure users know to run it manually first if not included here.
+        # Or, uncomment if it's to be fully automated and idempotent.
+        # echo "Executing 00-bootstrap stage..."
+        # ./run.sh -s bootstrap -t init-apply-auto-approve
+
+        echo "Executing 01-organization stage for NLB..."
+        ./run.sh -s organization -t init-apply-auto-approve
+
+        echo "Executing 02-networking stage for NLB..."
+        ./run.sh -s networking -t init-apply-auto-approve
+        
+        echo "Executing 03-security/Certificates/Compute-SSL-Certs/Google-Managedfor NLB..."
+        # This assumes run.sh correctly maps 'security/certificates/compute-ssl-certs/google-managed' to 'execution/03-security/Certificates/Compute-SSL-Certs/Google-Managed'
+        ./run.sh -s security/certificates/compute-ssl-certs/google-managed -t init-apply-auto-approve
+
+        echo "Executing 03-security/ stage for NLB..."
+        # This assumes run.sh correctly maps 'security/mig' to 'execution/03-security/MIG/'
+        ./run.sh -s security/mig -t init-apply-auto-approve
+
+        echo "Executing 06-consumer/MIG stage for NLB..."
+        # This assumes run.sh correctly maps 'consumer/mig' to 'execution/06-consumer/MIG/'
+        ./run.sh -s consumer/mig -t init-apply-auto-approve
+        
+        echo "Executing 07-consumer-load-balancing/Network/Passthrough/Internal stage for NLB..."
+        # This assumes run.sh correctly maps this long stage name
+        ./run.sh -s load-balancing/network/passthrough/internal -t init-apply-auto-approve
+
+        echo "NLB Passthrough deployment completed."
+
+options:
+  env:
+    # PROJECT_ID is automatically available in Cloud Build.
+    # Terraform variables should primarily be set in their respective .tfvars files as per the guide.
+    # This TF_VAR_project_id can serve as a fallback or override if variables are defined to accept it.
+    - 'TF_VAR_project_id=$PROJECT_ID'
+
+# Increase timeout if deployment takes longer
+timeout: 7200s # 2 hours
+
+tags:
+  - 'terraform'
+  - 'google-managed-ssl-certificates'
+  - 'ssl-nlb-passthrough'
+  - 'external-lb'
+  - 'apply'

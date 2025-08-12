@@ -1,0 +1,76 @@
+# Copyright 2025 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+
+steps:
+- id: 'destroy-ssl-nlb-passthrough'
+  name: 'gcr.io/google.com/cloudsdktool/cloud-sdk:latest'
+  entrypoint: /bin/bash
+  args:
+   - '-c'
+   - |
+        set -e # Fail on any error
+        apt-get update -y && apt-get install -y unzip git wget
+
+        TERRAFORM_VERSION="1.11.4"
+        echo "Downloading Terraform v$${TERRAFORM_VERSION}..."
+        wget https://releases.hashicorp.com/terraform/$${TERRAFORM_VERSION}/terraform_$${TERRAFORM_VERSION}_linux_amd64.zip
+        unzip terraform_$${TERRAFORM_VERSION}_linux_amd64.zip
+        mv terraform /usr/local/bin/
+        terraform version
+
+        cd execution
+
+        echo "Destroying 07-consumer-load-balancing/Network/Passthrough/Internal stage resources..."
+        ./run.sh -s load-balancing/network/passthrough/internal -t init
+        ./run.sh -s load-balancing/network/passthrough/internal -t destroy-auto-approve
+
+        echo "Destroying 06-consumer/MIG stage resources..."
+        ./run.sh -s consumer/mig -t init
+        ./run.sh -s consumer/mig -t destroy-auto-approve
+
+        echo "Destroying 03-security/MIG stage resources..."
+        ./run.sh -s security/mig -t init
+        ./run.sh -s security/mig -t destroy-auto-approve
+
+        echo "Destroying 03-security/Certificates/Compute-SSL-Certs/Google-Managed stage resources..."
+        ./run.sh -s security/certificates/compute-ssl-certs/google-managed -t init
+        ./run.sh -s security/certificates/compute-ssl-certs/google-managed -t destroy-auto-approve
+
+        echo "Destroying 02-networking stage resources..."
+        ./run.sh -s networking -t init
+        ./run.sh -s networking -t destroy-auto-approve
+
+        echo "Destroying 01-organization stage resources..."
+        ./run.sh -s organization -t init
+        ./run.sh -s organization -t destroy-auto-approve
+        
+        # If bootstrap was part of apply, uncomment to destroy:
+        # echo "Destroying 00-bootstrap stage resources..."
+        # ./run.sh -s bootstrap -t init
+        # ./run.sh -s bootstrap -t destroy-auto-approve
+
+        echo "NLB Passthrough with SSL destruction completed."
+
+options:
+  env:
+    - 'TF_VAR_project_id=$PROJECT_ID'
+timeout: 7200s # 2 hours
+
+tags:
+  - 'terraform'
+  - 'google-managed-ssl-certificates'
+  - 'nlb-passthrough'
+  - 'external-lb'
+  - 'destroy'
