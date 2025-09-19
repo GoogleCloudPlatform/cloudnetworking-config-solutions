@@ -14,7 +14,7 @@
 
 module "dns" {
   for_each = local.dns_zones_map
-  source   = "github.com/GoogleCloudPlatform/cloud-foundation-fabric//modules/dns?ref=v31.0.0"
+  source   = "github.com/GoogleCloudPlatform/cloud-foundation-fabric//modules/dns?ref=v44.1.0"
 
   project_id    = each.value.project_id
   name          = each.value.name

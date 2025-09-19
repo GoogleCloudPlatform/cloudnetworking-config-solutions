@@ -13,7 +13,7 @@
 # limitations under the License.
 
 module "cloud_run_service" {
-  source                 = "github.com/GoogleCloudPlatform/cloud-foundation-fabric//modules/cloud-run-v2?ref=v34.1.0"
+  source                 = "github.com/GoogleCloudPlatform/cloud-foundation-fabric//modules/cloud-run-v2?ref=v44.1.0"
   for_each               = { for service in local.instance_list : service.name => service }
   project_id             = each.value.project_id
   region                 = each.value.region

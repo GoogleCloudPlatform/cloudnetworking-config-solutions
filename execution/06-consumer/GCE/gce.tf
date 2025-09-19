@@ -14,7 +14,7 @@
 
 module "vm" {
   for_each = local.instance_map
-  source   = "github.com/GoogleCloudPlatform/cloud-foundation-fabric//modules/compute-vm?ref=v38.1.0"
+  source   = "github.com/GoogleCloudPlatform/cloud-foundation-fabric//modules/compute-vm?ref=v44.1.0"
 
   # Basic VM Configuration
   name             = each.value.name
