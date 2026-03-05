@@ -25,7 +25,7 @@ fi
 
 echo "Running prerequisites on project $GOOGLE_CLOUD_PROJECT for NLB Passthrough deployment."
 BUCKET_NAME_NLB=$GOOGLE_CLOUD_PROJECT-tf-state-nlb-passthrough # More specific bucket name
-if gsutil ls gs://$BUCKET_NAME_NLB; then
+if gcloud storage ls gs://$BUCKET_NAME_NLB; then
     echo "Terraform bucket gs://$BUCKET_NAME_NLB already created!"
 else
     echo "Creating Terraform state bucket gs://$BUCKET_NAME_NLB..."

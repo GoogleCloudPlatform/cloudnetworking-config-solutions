@@ -25,7 +25,7 @@ fi
 
 echo "Running prerequisites on project $GOOGLE_CLOUD_PROJECT for Application Load Balancer deployment."
 BUCKET_NAME_ALB=$GOOGLE_CLOUD_PROJECT-tf-state-alb
-if gsutil ls gs://$BUCKET_NAME_ALB; then
+if gcloud storage ls gs://$BUCKET_NAME_ALB; then
     echo "Terraform bucket gs://$BUCKET_NAME_ALB already created!"
 else
     echo "Creating Terraform state bucket gs://$BUCKET_NAME_ALB..."

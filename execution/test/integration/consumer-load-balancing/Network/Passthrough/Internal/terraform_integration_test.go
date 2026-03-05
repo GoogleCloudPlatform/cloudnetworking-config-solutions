@@ -615,7 +615,7 @@ else
 fi
 
 # Upload the result to GCS
-gsutil cp /tmp/result.txt gs://${BUCKET_NAME}/${RESULT_OBJECT_NAME}.txt
+gcloud storage cp /tmp/result.txt gs://${BUCKET_NAME}/${RESULT_OBJECT_NAME}.txt
 `, lbIpToTest, bucketName, vmName, apachePort)
 
 	scriptFileName := fmt.Sprintf("startup-script-%s.sh", vmName)

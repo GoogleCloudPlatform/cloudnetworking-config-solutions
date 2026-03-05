@@ -694,15 +694,15 @@ This complements UploadGcsObjectFromString.
 func UploadGCSObjectFromFile(t *testing.T, projectID string, localFilePath, bucketName, objectName string) (string, error) {
 	t.Helper()
 	t.Logf("Uploading %s to gs://%s/%s", localFilePath, bucketName, objectName)
-	gsutilUploadPath := fmt.Sprintf("gs://%s/%s", bucketName, objectName)
+	objectUploadPath := fmt.Sprintf("gs://%s/%s", bucketName, objectName)
 
 	cmd := shell.Command{
 		Command: "gcloud",
-		Args:    []string{"storage", "cp", localFilePath, gsutilUploadPath, "--project=" + projectID},
+		Args:    []string{"storage", "cp", localFilePath, objectUploadPath, "--project=" + projectID},
 	}
 	_, err := shell.RunCommandAndGetOutputE(t, cmd)
 	if err != nil {
-		return "", fmt.Errorf("failed to upload %s to %s: %w", localFilePath, gsutilUploadPath, err)
+		return "", fmt.Errorf("failed to upload %s to %s: %w", localFilePath, objectUploadPath, err)
 	}
 
 	// This is the HTTPS URL for App Engine source, gs:// paths are not valid here.

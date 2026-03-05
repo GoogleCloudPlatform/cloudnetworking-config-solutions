@@ -25,11 +25,11 @@ fi
 
 echo Running prerequisites on project $GOOGLE_CLOUD_PROJECT
 BUCKET_NAME=$GOOGLE_CLOUD_PROJECT-tf-state-1
-if gsutil ls gs://$BUCKET_NAME; then
+if gcloud storage ls gs://$BUCKET_NAME; then
     echo Terraform bucket already created!
 else
     echo Creating Terraform state bucket...
-    #gsutil mb $BUCKET_NAME
+    #gcloud storage buckets create gs://$BUCKET_NAME
     gcloud storage buckets create gs://$BUCKET_NAME --project=$GOOGLE_CLOUD_PROJECT --uniform-bucket-level-access
 fi
 
