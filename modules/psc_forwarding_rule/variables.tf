@@ -57,6 +57,9 @@ variable "psc_endpoints" {
       cluster_id = optional(string)
     }), {})
 
+    # Rule custom name.
+    rule_custom_name = optional(string, "custom")
+
     # The target for the forwarding rule.
     target = optional(string)
   }))

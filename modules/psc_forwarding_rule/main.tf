@@ -37,7 +37,7 @@ data "google_alloydb_instance" "alloydb_instance" {
 resource "google_compute_address" "psc_address" {
   for_each     = { for idx, config in var.psc_endpoints : idx => config if config.ip_address_literal != null }
   project      = each.value.endpoint_project_id
-  name         = "psc-compute-address-${each.value.producer_cloudsql != null && each.value.producer_cloudsql.instance_name != null ? each.value.producer_cloudsql.instance_name : (each.value.producer_alloydb != null && each.value.producer_alloydb.instance_name != null ? each.value.producer_alloydb.instance_name : "custom-${each.key}")}"
+  name         = "psc-compute-address-${each.value.producer_cloudsql != null && each.value.producer_cloudsql.instance_name != null ? each.value.producer_cloudsql.instance_name : (each.value.producer_alloydb != null && each.value.producer_alloydb.instance_name != null ? each.value.producer_alloydb.instance_name : "${each.value.rule_custom_name}-${each.key}")}"
   region       = each.value.region != null ? each.value.region : (each.value.producer_cloudsql != null && each.value.producer_cloudsql.instance_name != null ? data.google_sql_database_instance.cloudsql_instance[each.key].region : (each.value.producer_alloydb != null && each.value.producer_alloydb.instance_name != null ? data.google_alloydb_instance.alloydb_instance[each.key].location : split("/", each.value.target)[3]))
   address_type = "INTERNAL"
   subnetwork   = each.value.subnetwork_name
@@ -47,7 +47,7 @@ resource "google_compute_address" "psc_address" {
 resource "google_compute_forwarding_rule" "psc_forwarding_rule" {
   for_each                = { for idx, config in var.psc_endpoints : idx => config }
   project                 = each.value.endpoint_project_id
-  name                    = "psc-forwarding-rule-${each.value.producer_cloudsql != null && each.value.producer_cloudsql.instance_name != null ? each.value.producer_cloudsql.instance_name : (each.value.producer_alloydb != null && each.value.producer_alloydb.instance_name != null ? each.value.producer_alloydb.instance_name : "custom-${each.key}")}"
+  name                    = "psc-forwarding-rule-${each.value.producer_cloudsql != null && each.value.producer_cloudsql.instance_name != null ? each.value.producer_cloudsql.instance_name : (each.value.producer_alloydb != null && each.value.producer_alloydb.instance_name != null ? each.value.producer_alloydb.instance_name : "${each.value.rule_custom_name}-${each.key}")}"
   region                  = each.value.region != null ? each.value.region : (each.value.producer_cloudsql != null && each.value.producer_cloudsql.instance_name != null ? data.google_sql_database_instance.cloudsql_instance[each.key].region : (each.value.producer_alloydb != null && each.value.producer_alloydb.instance_name != null ? data.google_alloydb_instance.alloydb_instance[each.key].location : split("/", each.value.target)[3]))
   network                 = each.value.network_name
   subnetwork              = each.value.subnetwork_name
