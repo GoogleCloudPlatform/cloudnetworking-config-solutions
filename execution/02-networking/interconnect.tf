@@ -32,7 +32,7 @@ resource "google_compute_router" "interconnect-router" {
 
 module "vlan_attachment_a" {
   count       = var.create_interconnect ? 1 : 0
-  source      = "github.com/GoogleCloudPlatform/cloud-foundation-fabric//modules/net-vlan-attachment?ref=v36.0.1"
+  source      = "github.com/GoogleCloudPlatform/cloud-foundation-fabric//modules/net-vlan-attachment?ref=v36.2.0"
   network     = local.network_name
   project_id  = var.project_id
   region      = var.region
@@ -58,7 +58,7 @@ module "vlan_attachment_a" {
 
 module "vlan_attachment_b" {
   count       = var.create_interconnect ? 1 : 0
-  source      = "github.com/GoogleCloudPlatform/cloud-foundation-fabric//modules/net-vlan-attachment?ref=v36.0.1"
+  source      = "github.com/GoogleCloudPlatform/cloud-foundation-fabric//modules/net-vlan-attachment?ref=v36.2.0"
   network     = local.network_name
   project_id  = var.project_id
   region      = var.region
