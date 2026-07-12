@@ -13,7 +13,7 @@
 # limitations under the License.
 
 module "response_policy" {
-  source   = "github.com/GoogleCloudPlatform/cloud-foundation-fabric//modules/dns-response-policy?ref=v41.0.0"
+  source   = "github.com/GoogleCloudPlatform/cloud-foundation-fabric//modules/dns-response-policy?ref=v41.1.0"
   for_each = local.response_policies_enabled_map
 
   project_id       = each.value.project_id
