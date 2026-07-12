@@ -16,7 +16,7 @@
 module "workbench_instance" {
   for_each = local.workbench_map
   source   = "GoogleCloudPlatform/vertex-ai/google//modules/workbench"
-  version  = "~> 0.1"
+  version  = "~> 0.2"
 
   name       = each.value.name
   project_id = each.value.project_id
