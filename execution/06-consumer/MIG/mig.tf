@@ -14,7 +14,7 @@
 
 module "mig" {
   for_each              = local.mig_map
-  source                = "github.com/GoogleCloudPlatform/cloud-foundation-fabric//modules/compute-mig?ref=v41.0.0"
+  source                = "github.com/GoogleCloudPlatform/cloud-foundation-fabric//modules/compute-mig?ref=v41.1.0"
   project_id            = each.value.project_id
   location              = each.value.location
   name                  = each.value.name
