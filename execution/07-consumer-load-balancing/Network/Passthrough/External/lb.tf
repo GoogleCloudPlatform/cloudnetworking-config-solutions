@@ -14,7 +14,7 @@
 
 module "nlb_passthrough_ext" {
   for_each = local.lb_map
-  source   = "github.com/GoogleCloudPlatform/cloud-foundation-fabric//modules/net-lb-ext?ref=v39.0.0"
+  source   = "github.com/GoogleCloudPlatform/cloud-foundation-fabric//modules/net-lb-ext?ref=v39.2.0"
 
   # Required variables mapped from locals
   project_id = each.value.project_id
