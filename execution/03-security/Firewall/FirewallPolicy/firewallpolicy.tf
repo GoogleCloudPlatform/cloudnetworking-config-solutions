@@ -16,7 +16,7 @@
 
 module "network_firewall_policy" {
   for_each      = local.instance_map
-  source        = "github.com/GoogleCloudPlatform/cloud-foundation-fabric//modules/net-firewall-policy?ref=v40.1.0"
+  source        = "github.com/GoogleCloudPlatform/cloud-foundation-fabric//modules/net-firewall-policy?ref=v40.2.0"
   region        = each.value.region
   name          = each.value.name
   parent_id     = each.value.parent_id
