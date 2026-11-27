@@ -1,5 +1,22 @@
 # CloudNet Config Solutions: Simplified Google Cloud Networking with Terraform 🌐
 
+> [!WARNING]
+> **THIS REPOSITORY IS DEPRECATED AND IS NO LONGER MAINTAINED.**
+>
+> This repository has been deprecated and is no longer actively supported or
+> maintained. There will be no further bug fixes, feature updates, or
+> security patches. Do not use these Terraform templates in production
+> without independent security review and hardening.
+>
+> For actively maintained Google Cloud Terraform modules and networking
+> blueprints, see
+> [Cloud Foundation Fabric](https://github.com/GoogleCloudPlatform/cloud-foundation-fabric)
+> and
+> [Terraform Google Modules](https://github.com/terraform-google-modules).
+>
+> This repository is being archived (read-only). Users may fork it if they
+> wish to maintain it independently.
+
 ## Introduction
 
 This repository leverages pre-built terraform templates to streamline the setup and management of Google Cloud's networking infrastructure. This project accelerates your access to managed services like AlloyDB, GKE, Vertex AI services, Cloud SQL and Memorystore for Redis Clusters while maintaining robust security boundaries between your on-premises resources and the cloud environment. By defining role-based stages, the solution ensures that only authorized users can modify specific network components, adhering to the principle of least privilege and enhancing overall security.
